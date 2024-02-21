@@ -48,6 +48,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	// 初始化表结构创建
+	err = dao2.InitTables(db)
+	if err != nil {
+		panic(err)
+	}
 	// 创建一大堆变量
 	dao := dao2.NewUserDAO(db)
 	repo := repository.NewUserRepository(dao)

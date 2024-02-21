@@ -10,6 +10,8 @@ import (
 // @Author 代码小学生王木木
 // @Date 2024-02-21 10:45
 
+var RepoErrUserDuplicateEmail = dao.ErrUserDuplicateEmail
+
 type UserRepository struct {
 	userDao *dao.UserDAO
 }
@@ -25,6 +27,17 @@ func (r *UserRepository) Create(ctx context.Context, u domain.User) error {
 		Email:    u.Email,
 		Password: u.Password,
 	})
+}
+
+func (r *UserRepository) FindByEmail(ctx context.Context, u domain.User) (domain.User, error) {
+	email, err := r.userDao.FindByEmail(ctx, u.Email)
+	if err != nil {
+		return domain.User{}, err
+	}
+	return domain.User{
+		Email:    email.Email,
+		Password: email.Password,
+	}, err
 }
 
 func (r *UserRepository) FindById(int642 int64) {

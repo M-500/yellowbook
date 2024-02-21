@@ -2,6 +2,8 @@ package dao
 
 import (
 	"context"
+	"errors"
+	"github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
 	"time"
 )
@@ -9,6 +11,10 @@ import (
 // @Description
 // @Author 代码小学生王木木
 // @Date 2024-02-21 10:49
+
+var (
+	ErrUserDuplicateEmail = errors.New("邮箱已经存在")
+)
 
 type UserDAO struct {
 	db *gorm.DB
@@ -24,7 +30,21 @@ func (dao *UserDAO) Insert(ctx context.Context, user UserModel) error {
 	now := time.Now().UnixMilli() // 毫秒数
 	user.Ctime = now
 	user.Utime = now
-	return dao.db.WithContext(ctx).Create(&user).Error
+	err := dao.db.WithContext(ctx).Create(&user).Error
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		const uniqueConflictsErrNo uint16 = 1062
+		if mysqlErr.Number == uniqueConflictsErrNo {
+			// 邮箱冲突
+			return ErrUserDuplicateEmail
+		}
+	}
+	return err
+}
+
+func (dao *UserDAO) FindByEmail(ctx context.Context, email string) (UserModel, error) {
+	u := UserModel{}
+	err := dao.db.WithContext(ctx).Where("email = ?", email).First(&u).Error
+	return u, err
 }
 
 // UserModel
@@ -38,3 +58,7 @@ type UserModel struct {
 	// 更新时间 存储毫秒数
 	Utime int64
 }
+
+//func (UserModel) TableName() string {
+//	return "user_info"
+//}

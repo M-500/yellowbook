@@ -8,6 +8,7 @@ package web
 
 import (
 	"backend/internal/domain"
+	"backend/internal/repository"
 	"backend/internal/service"
 	"github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
@@ -80,6 +81,10 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 		Email:    req.Email,
 		Password: req.Password,
 	})
+	if err == repository.RepoErrUserDuplicateEmail {
+		ctx.JSON(http.StatusOK, gin.H{"msg": "邮箱已经存在"})
+		return
+	}
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{"msg": "系统内部错误"})
 		return
@@ -89,6 +94,23 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 }
 
 func (u *UserHandler) Login(ctx *gin.Context) {
+	type LoginReq struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	var req LoginReq
+	if err := ctx.Bind(&req); err != nil {
+		return
+	}
+	err := u.svc.Login(ctx, domain.User{
+		Email:    req.Email,
+		Password: req.Password,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"msg": "系统内部错误"})
+		return
+	}
+
 }
 
 func (u *UserHandler) Profile(ctx *gin.Context) {
