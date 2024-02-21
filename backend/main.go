@@ -13,6 +13,8 @@ import (
 	"backend/internal/web"
 	"fmt"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -43,6 +45,9 @@ func main() {
 		},
 		MaxAge: 12 * time.Hour,
 	}))
+	// 处理session问题 使用gin session插件
+	store := cookie.NewStore([]byte("secret"))
+	server.Use(sessions.Sessions("mysession", store))
 
 	db, err := gorm.Open(mysql.Open("admin:123456@tcp(192.168.1.52:3306)/xhs"), &gorm.Config{})
 	if err != nil {

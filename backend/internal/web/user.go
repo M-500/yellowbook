@@ -11,6 +11,7 @@ import (
 	"backend/internal/repository"
 	"backend/internal/service"
 	"github.com/dlclark/regexp2"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -90,7 +91,7 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 		return
 	}
 	//响应前端
-	ctx.JSON(http.StatusOK, gin.H{"msg": "登录成功！"})
+	ctx.JSON(http.StatusOK, gin.H{"msg": "注册成功！"})
 }
 
 func (u *UserHandler) Login(ctx *gin.Context) {
@@ -102,7 +103,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 	if err := ctx.Bind(&req); err != nil {
 		return
 	}
-	err := u.svc.Login(ctx, domain.User{
+	doUser, err := u.svc.Login(ctx, domain.User{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -110,7 +111,13 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"msg": "系统内部错误"})
 		return
 	}
-
+	//登录成功后 将session拿出来
+	sess := sessions.Default(ctx)
+	// 设置值到session中 比如设置用户id
+	sess.Set("userId", doUser.Id)
+	sess.Save()
+	ctx.JSON(http.StatusOK, gin.H{"msg": "登录成功！"})
+	return
 }
 
 func (u *UserHandler) Profile(ctx *gin.Context) {
