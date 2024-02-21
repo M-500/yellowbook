@@ -11,6 +11,7 @@ import (
 	dao2 "backend/internal/repository/dao"
 	"backend/internal/service"
 	"backend/internal/web"
+	"backend/internal/web/middleware"
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
@@ -45,9 +46,13 @@ func main() {
 		},
 		MaxAge: 12 * time.Hour,
 	}))
+
 	// 处理session问题 使用gin session插件
 	store := cookie.NewStore([]byte("secret"))
 	server.Use(sessions.Sessions("mysession", store))
+
+	// 登录拦截
+	server.Use(middleware.NewLoginMiddlewareBuilder().Build())
 
 	db, err := gorm.Open(mysql.Open("admin:123456@tcp(192.168.1.52:3306)/xhs"), &gorm.Config{})
 	if err != nil {
