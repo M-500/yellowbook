@@ -115,11 +115,28 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 	sess := sessions.Default(ctx)
 	// 设置值到session中 比如设置用户id
 	sess.Set("userId", doUser.Id)
+	sess.Options(sessions.Options{
+		//Path:     "",
+		//Domain:   "",
+		//MaxAge:   0,
+		Secure: true,
+		//HttpOnly: false,
+		//SameSite: 0,
+	})
 	sess.Save()
 	ctx.JSON(http.StatusOK, gin.H{"msg": "登录成功！"})
 	return
 }
 
+func (u *UserHandler) Logout(ctx *gin.Context) {
+	sess := sessions.Default(ctx)
+	// 设置值到session中 比如设置用户id
+	sess.Options(sessions.Options{
+		MaxAge: -1,
+	})
+	sess.Save()
+	ctx.JSON(http.StatusOK, gin.H{"msg": "退出登录！"})
+}
 func (u *UserHandler) Profile(ctx *gin.Context) {
 }
 

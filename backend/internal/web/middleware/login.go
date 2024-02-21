@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
 
 // @Description
@@ -40,8 +41,30 @@ func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 			return
 		}
 		id := sess.Get("userId")
+
 		if id == nil {
 			ctx.AbortWithStatus(http.StatusForbidden) // 不让访问
+			return
+		}
+		// 我怎么知道1分钟已经过了？ 或者说我怎么定时刷新我的session？
+
+		// 获取到上一次的更新时间
+		updateTime := sess.Get("update_time")
+		now := time.Now().UnixMilli()
+		if updateTime == nil {
+			// 还没有刷新过 那就刷新一下
+			sess.Set("update_time", now)
+			sess.Save()
+			return
+		}
+		// 刷新时间过期？
+		updateTimeVal, ok := updateTime.(int64)
+		if !ok {
+
+		}
+		if now-updateTimeVal > 60*1000 {
+			sess.Set("update_time", now)
+			sess.Save()
 			return
 		}
 	}
