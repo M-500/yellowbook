@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -48,7 +48,12 @@ func main() {
 	}))
 
 	// 处理session问题 使用gin session插件
-	store := cookie.NewStore([]byte("secret"))
+	//store := cookie.NewStore([]byte("secret"))
+	newStore, err2 := redis.NewStore(16, "tcp", "localhost:6379", "", []byte("wulinlin"), []byte("wulinlin"))
+	if err2 != nil {
+		panic(err2)
+	}
+	store := newStore
 	server.Use(sessions.Sessions("mysession", store))
 
 	// 登录拦截

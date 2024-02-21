@@ -46,3 +46,57 @@ func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 		}
 	}
 }
+
+var IgnorePath []string
+
+// CheckLoginV1
+//
+//	@Description: 中间件的V1版本
+//	@return gin.HandlerFunc
+func CheckLoginV1() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		for _, p := range IgnorePath {
+			if ctx.Request.URL.Path == p {
+				return
+			}
+		}
+		//if ctx.Request.URL.Path == "/users/signup" || ctx.Request.URL.Path == "/users/login" {
+		//	//ctx.Next()
+		//	return
+		//}
+		sess := sessions.Default(ctx)
+		if sess == nil {
+			ctx.AbortWithStatus(http.StatusForbidden) // 不让访问
+			return
+		}
+		id := sess.Get("userId")
+		if id == nil {
+			ctx.AbortWithStatus(http.StatusForbidden) // 不让访问
+			return
+		}
+	}
+}
+
+// CheckLoginV2
+//
+//	@Description: session中间件的第二种方法
+//	@return gin.HandlerFunc
+func CheckLoginV2(paths []string) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		for _, p := range paths {
+			if ctx.Request.URL.Path == p {
+				return
+			}
+		}
+		sess := sessions.Default(ctx)
+		if sess == nil {
+			ctx.AbortWithStatus(http.StatusForbidden) // 不让访问
+			return
+		}
+		id := sess.Get("userId")
+		if id == nil {
+			ctx.AbortWithStatus(http.StatusForbidden) // 不让访问
+			return
+		}
+	}
+}
