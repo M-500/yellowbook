@@ -36,6 +36,7 @@ func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 		//	return
 		//}
 		sess := sessions.Default(ctx)
+		uId := sess.Get("userId")
 		if sess == nil {
 			ctx.AbortWithStatus(http.StatusForbidden) // 不让访问
 			return
@@ -50,6 +51,10 @@ func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 
 		// 获取到上一次的更新时间
 		updateTime := sess.Get("update_time")
+		sess.Set("userId", uId)
+		sess.Options(sessions.Options{
+			MaxAge: 60 * 1000,
+		})
 		now := time.Now().UnixMilli()
 		if updateTime == nil {
 			// 还没有刷新过 那就刷新一下

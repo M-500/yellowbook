@@ -10,9 +10,11 @@ import (
 	"backend/internal/domain"
 	"backend/internal/repository"
 	"backend/internal/service"
+	"fmt"
 	"github.com/dlclark/regexp2"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 )
 
@@ -92,6 +94,37 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 	}
 	//响应前端
 	ctx.JSON(http.StatusOK, gin.H{"msg": "注册成功！"})
+}
+
+func (u *UserHandler) LoginJWT(ctx *gin.Context) {
+	type LoginReq struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	var req LoginReq
+	if err := ctx.Bind(&req); err != nil {
+		return
+	}
+	_, err := u.svc.Login(ctx, domain.User{
+		Email:    req.Email,
+		Password: req.Password,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"msg": "系统内部错误"})
+		return
+	}
+
+	// 这里生成一个JWT
+	token := jwt.New(jwt.SigningMethodES512)
+	tokenStr, err := token.SignedString([]byte("wulinlin"))
+	if err != nil {
+		ctx.String(http.StatusInternalServerError, "系统错误")
+		return
+	}
+	ctx.Header("x-jwt-token", tokenStr)
+	fmt.Println(tokenStr, "哈哈")
+	ctx.JSON(http.StatusOK, gin.H{"msg": "登录成功！"})
+	return
 }
 
 func (u *UserHandler) Login(ctx *gin.Context) {
