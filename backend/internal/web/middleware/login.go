@@ -11,18 +11,29 @@ import (
 // @Date 2024-02-21 18:55
 
 type LoginMiddlewareBuilder struct {
+	paths []string
 }
 
 func NewLoginMiddlewareBuilder() *LoginMiddlewareBuilder {
-	return &LoginMiddlewareBuilder{}
+	return &LoginMiddlewareBuilder{
+		paths: []string{},
+	}
 }
-
+func (l *LoginMiddlewareBuilder) IgnorePaths(path string) *LoginMiddlewareBuilder {
+	l.paths = append(l.paths, path)
+	return l
+}
 func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		if ctx.Request.URL.Path == "/users/signup" || ctx.Request.URL.Path == "/users/login" {
-			//ctx.Next()
-			return
+		for _, p := range l.paths {
+			if ctx.Request.URL.Path == p {
+				return
+			}
 		}
+		//if ctx.Request.URL.Path == "/users/signup" || ctx.Request.URL.Path == "/users/login" {
+		//	//ctx.Next()
+		//	return
+		//}
 		sess := sessions.Default(ctx)
 		if sess == nil {
 			ctx.AbortWithStatus(http.StatusForbidden) // 不让访问

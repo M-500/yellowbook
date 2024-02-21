@@ -52,7 +52,9 @@ func main() {
 	server.Use(sessions.Sessions("mysession", store))
 
 	// 登录拦截
-	server.Use(middleware.NewLoginMiddlewareBuilder().Build())
+	server.Use(middleware.NewLoginMiddlewareBuilder().
+		IgnorePaths("/users/signup").
+		IgnorePaths("/users/login").Build())
 
 	db, err := gorm.Open(mysql.Open("admin:123456@tcp(192.168.1.52:3306)/xhs"), &gorm.Config{})
 	if err != nil {
