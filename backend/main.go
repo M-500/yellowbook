@@ -37,12 +37,12 @@ func main() {
 	redisClient := redis.NewClient(&redis.Options{
 		Addr: "192.168.1.52:6379",
 	})
-	server.Use(ratelimit.NewBuilder(redisClient, time.Second, 100).Build())
+	server.Use(ratelimit.NewBuilder(redisClient, time.Minute, 100).Build())
 	server.Use(cors.New(cors.Config{
 		//AllowOrigins:     []string{"https://foo.com"},
 		//AllowMethods:     []string{"PUT", "PATCH"},
 		AllowHeaders: []string{"Content-Type", "Authorization"},
-		//ExposeHeaders:    []string{"Content-Length"},
+		//ExposeHeaders:    []string{"Content-Length "},
 		AllowCredentials: true,
 		AllowOriginFunc: func(origin string) bool {
 			if strings.HasPrefix(origin, "http://localhost") {

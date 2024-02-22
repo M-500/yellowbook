@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: webook
+spec:
+  type: LoadBalancer # 把他当做一个负载句很强
+  selector:
+    app: webook
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+
+  

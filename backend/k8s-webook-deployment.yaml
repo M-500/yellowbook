@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webook
+spec:
+  replicas: 3 # 副本数量 部署3份
+  # 筛选器
+  selector:
+    matchLabels:
+      app: webook
+  # 描述的是你的 POD是什么样的
+  template:
+    metadata:
+      name: webook
+      labels:
+        app: webook
+  # Pod 的具体信息
+    spec:
+      containers:
+        - name: webook
+          image: wulinlin/webook:v0.0.1
+          ports:
+            - containerPort: 8080  # 对外暴露的端口
+
+
