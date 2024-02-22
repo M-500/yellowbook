@@ -43,7 +43,12 @@ func (dao *UserDAO) Insert(ctx context.Context, user UserModel) error {
 
 func (dao *UserDAO) FindByEmail(ctx context.Context, email string) (UserModel, error) {
 	u := UserModel{}
-	err := dao.db.WithContext(ctx).Where("email = ?", email).First(&u).Error
+	err := dao.db.WithContext(ctx).Where("`email` = ?", email).First(&u).Error
+	return u, err
+}
+func (dao *UserDAO) FindById(ctx context.Context, id int64) (UserModel, error) {
+	u := UserModel{}
+	err := dao.db.WithContext(ctx).Where("`id` = ?", id).First(&u).Error
 	return u, err
 }
 
