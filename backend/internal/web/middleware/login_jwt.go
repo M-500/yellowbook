@@ -4,6 +4,7 @@ import (
 	"backend/internal/web"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -64,8 +65,32 @@ func (l *LoginJWTMiddlewareBuilder) Build() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
+
+		// v2 Start 每10s 刷新依稀
+		now := time.Now()
+		if claims.ExpiresAt.Sub(now) < time.Second*50 {
+			claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Minute * 10))
+			tokenStr, err = parse.SignedString([]byte("wulinlin")) // 续约token
+			if err != nil {
+				// 记录续约失败的日志
+				log.Printf("JWT续约失败,%s", err)
+			}
+			ctx.Header("x-jwt-token", tokenStr) // 续约的token 再次返回给前端
+		}
+		// V2 end
+
+		// V1 Start
+		claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Hour * 1))
+		tokenStr, err = parse.SignedString([]byte("wulinlin")) // 续约token
+		if err != nil {
+			// 记录续约失败的日志
+			log.Printf("JWT续约失败,%s", err)
+		}
+		ctx.Header("x-jwt-token", tokenStr) // 续约的token 再次返回给前端
+		// V1 end
+
 		// 将JWT解析的数据 插入到gin的Context上下文中
-		ctx.Set("claims", claims)
+		//ctx.Set("claims", claims)
 		ctx.Set("userId", claims.UserId)
 	}
 }
