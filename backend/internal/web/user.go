@@ -175,7 +175,29 @@ func (u *UserHandler) Logout(ctx *gin.Context) {
 	sess.Save()
 	ctx.JSON(http.StatusOK, gin.H{"msg": "退出登录！"})
 }
+func (u *UserHandler) ProfileJWT(ctx *gin.Context) {
+	// 获取jwt的内容
+	value, ok := ctx.Get("claims") // 这里拿到的是一个any类型
+	if !ok {
+		// 这部分的逻辑你可以省略，因为必然会有 claims
+		// 当然也可以考虑监控住这里
+		// 最眼睛的写法
+		ctx.String(http.StatusOK, "系统错误")
+		return
+	}
+	claims, ok := value.(*UserClaims)
+	if !ok {
+		// ok代表是否成功
+		ctx.String(http.StatusOK, "系统错误")
+		return
+	}
+	println(claims.UserId)
+	// 写其他逻辑
+}
+
 func (u *UserHandler) Profile(ctx *gin.Context) {
+	// 获取jwt的内容
+
 }
 
 func (u *UserHandler) Edit(ctx *gin.Context) {

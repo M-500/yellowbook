@@ -57,5 +57,8 @@ func (l *LoginJWTMiddlewareBuilder) Build() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
+		// 将JWT解析的数据 插入到gin的Context上下文中
+		ctx.Set("claims", claims)
+		ctx.Set("userId", claims.UserId)
 	}
 }
