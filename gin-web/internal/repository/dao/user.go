@@ -10,8 +10,8 @@ import (
 
 type UserModel struct {
 	gorm.Model
-	UserName string
-	Phone    string
-	Email    string
-	Pwd      string
+	NickName string `json:"nickName"`
+	Phone    string `json:"phone"`
+	Email    string `json:"email"`
+	Pwd      string `json:"pwd"`
 }
