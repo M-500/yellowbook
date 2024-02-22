@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
+	"time"
 )
 
 const (
@@ -118,6 +119,9 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	//token := jwt.New(jwt.SigningMethodES512)
 	//token := jwt.NewWithClaims(jwt.SigningMethodES512, jwt.MapClaims{"userId": domainU.Id}) // 不建议用map来传递
 	claims := UserClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 6)), // 设置过期时间
+		},
 		UserId: domainU.Id,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodES512, claims)

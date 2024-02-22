@@ -6,6 +6,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // @Description
@@ -47,6 +48,12 @@ func (l *LoginJWTMiddlewareBuilder) Build() gin.HandlerFunc {
 		parse, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
 			return []byte("wulinlin"), nil
 		})
+		// 非要校验是否过期 (其实不用校验)
+		if claims.ExpiresAt.Time.Before(time.Now()) {
+			// token过期了
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
 		if err != nil {
 			// 用户没有登录
 			ctx.AbortWithStatus(http.StatusUnauthorized)
