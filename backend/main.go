@@ -12,11 +12,13 @@ import (
 	"backend/internal/service"
 	"backend/internal/web"
 	"backend/internal/web/middleware"
+	"backend/pkg/ginx/middleware/ratelimit"
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
+	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"strings"
@@ -31,7 +33,11 @@ func main() {
 	server.Use(func(context *gin.Context) {
 		fmt.Println("这里是第2个middleware")
 	})
-
+	// 初始化一个redis
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: "192.168.1.52:6379",
+	})
+	server.Use(ratelimit.NewBuilder(redisClient, time.Second, 100).Build())
 	server.Use(cors.New(cors.Config{
 		//AllowOrigins:     []string{"https://foo.com"},
 		//AllowMethods:     []string{"PUT", "PATCH"},
@@ -49,10 +55,14 @@ func main() {
 
 	// 处理session问题 使用gin session插件
 	//store := cookie.NewStore([]byte("secret"))
-	newStore, err2 := redis.NewStore(16, "tcp", "localhost:6379", "", []byte("wulinlin"), []byte("wulinlin"))
-	if err2 != nil {
-		panic(err2)
-	}
+	//newStore, err2 := redis.NewStore(16, "tcp", "localhost:6379", "", []byte("wulinlin"), []byte("wulinlin"))
+	//if err2 != nil {
+	//	panic(err2)
+	//}
+	newStore := memstore.NewStore([]byte("wulinlin"), []byte("wulinlin"))
+	//if err2 != nil {
+	//	panic(err2)
+	//}
 	store := newStore
 	server.Use(sessions.Sessions("mysession", store))
 
