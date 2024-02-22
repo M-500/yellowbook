@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"backend/internal/web"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
@@ -42,7 +43,8 @@ func (l *LoginJWTMiddlewareBuilder) Build() gin.HandlerFunc {
 			return
 		}
 		tokenStr := segs[1]
-		parse, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		claims := &web.UserClaims{}
+		parse, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
 			return []byte("wulinlin"), nil
 		})
 		if err != nil {
@@ -50,7 +52,7 @@ func (l *LoginJWTMiddlewareBuilder) Build() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		if !parse.Valid {
+		if !parse.Valid || parse == nil || claims.UserId == 0 {
 			// 用户没有登录
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return

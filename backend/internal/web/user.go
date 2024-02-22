@@ -105,7 +105,7 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	if err := ctx.Bind(&req); err != nil {
 		return
 	}
-	_, err := u.svc.Login(ctx, domain.User{
+	domainU, err := u.svc.Login(ctx, domain.User{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -115,7 +115,12 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	}
 
 	// 这里生成一个JWT
-	token := jwt.New(jwt.SigningMethodES512)
+	//token := jwt.New(jwt.SigningMethodES512)
+	//token := jwt.NewWithClaims(jwt.SigningMethodES512, jwt.MapClaims{"userId": domainU.Id}) // 不建议用map来传递
+	claims := UserClaims{
+		UserId: domainU.Id,
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodES512, claims)
 	tokenStr, err := token.SignedString([]byte("wulinlin"))
 	if err != nil {
 		ctx.String(http.StatusInternalServerError, "系统错误")
@@ -174,4 +179,10 @@ func (u *UserHandler) Profile(ctx *gin.Context) {
 }
 
 func (u *UserHandler) Edit(ctx *gin.Context) {
+}
+
+type UserClaims struct {
+	jwt.RegisteredClaims
+	// 声明自己需要放入token里的数据
+	UserId int64
 }
