@@ -2,9 +2,9 @@
 -- ZREMRANGEBYSCORE key1 0 6
 -- 7 执行完之后
 
--- 限流对象
+-- 限流对象 在Lua脚本中，KEYS是一个全局变量，它通常用于与Redis的Lua脚本交互。在Redis中，KEYS是一个用于存储键（Key）的数组，而KEYS[1]表示获取这个数组的第一个元素，即第一个键。
 local key = KEYS[1]
--- 窗口大小
+-- 窗口大小   ARGV 是一个全局变量，用于与 Redis 的 Lua 脚本交互。与 KEYS 变量类似，ARGV 是一个数组，用于存储从 Redis 传递给 Lua 脚本的命令参数。
 local window = tonumber(ARGV[1])
 -- 阈值
 local threshold = tonumber( ARGV[2])

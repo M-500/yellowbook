@@ -13,11 +13,16 @@ import (
 // @Date 2024-02-23 14:25
 
 var (
-	ErrSetSendTooMany = errors.New("验证码发送太频繁")
+	ErrSetSendTooMany    = errors.New("验证码发送太频繁")
+	ErrCodeVerifyTooMany = errors.New("验证次数太多")
+	ErrUnknownForCode    = errors.New("未知错误")
 )
 
 //go:embed lua/set_code.lua
 var luaSetCode string
+
+//go:embed lua/set_code.lua
+var luaVerifyCode string
 
 type CodeCache struct {
 	client redis.Cmdable
@@ -46,6 +51,25 @@ func (c *CodeCache) Set(ctx context.Context, biz, phone, code string) error {
 		return errors.New("系统内部错误")
 	}
 	return nil
+}
+
+func (c *CodeCache) Verify(ctx context.Context, biz, phone, inputCode string) (bool, error) {
+	val, err := c.client.Eval(ctx, luaVerifyCode, []string{c.key(biz, phone), inputCode}).Int()
+	if err != nil {
+		return false, err
+	}
+	switch val {
+	case 0:
+		return true, nil
+	case -1:
+		//有人搞你
+		return false, nil
+	case -2:
+		// 验证码出错
+		return false, ErrCodeVerifyTooMany
+	default:
+		return false, ErrUnknownForCode
+	}
 }
 
 func (c *CodeCache) key(biz, phone string) string {

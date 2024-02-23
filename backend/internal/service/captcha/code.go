@@ -50,7 +50,7 @@ func (svc *CodeService) Send(ctx context.Context, phone string, biz string) erro
 }
 
 func (svc *CodeService) Verify(ctx context.Context, code string, phone string, biz string) (bool, error) {
-	return true, nil
+	return svc.repo.Verify(ctx, biz, phone, code)
 }
 
 func (svc *CodeService) generateCode() string {
