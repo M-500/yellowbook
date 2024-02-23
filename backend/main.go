@@ -8,8 +8,11 @@ package main
 
 import (
 	"backend/internal/repository"
+	cache2 "backend/internal/repository/cache"
 	dao2 "backend/internal/repository/dao"
 	"backend/internal/service"
+	"backend/internal/service/captcha"
+	"backend/internal/service/sms/tencent"
 	"backend/internal/web"
 	"backend/internal/web/middleware"
 	"backend/pkg/ginx/middleware/ratelimit"
@@ -53,12 +56,11 @@ func main() {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	// 处理session问题 使用gin session插件
 	//store := cookie.NewStore([]byte("secret"))
-	//newStore, err2 := redis.NewStore(16, "tcp", "localhost:6379", "", []byte("wulinlin"), []byte("wulinlin"))
-	//if err2 != nil {
-	//	panic(err2)
-	//}
+	client := redis.NewClient(&redis.Options{
+		Addr:    "192.16.1.52:6379",
+		Network: "tcp"})
+	// 处理session问题 使用gin session插件
 	newStore := memstore.NewStore([]byte("wulinlin"), []byte("wulinlin"))
 	//if err2 != nil {
 	//	panic(err2)
@@ -82,9 +84,14 @@ func main() {
 	}
 	// 创建一大堆变量
 	dao := dao2.NewUserDAO(db)
-	repo := repository.NewUserRepository(dao)
+	cache := cache2.NewUserCache(client, time.Duration(15))
+	repo := repository.NewUserRepository(dao, cache)
 	svc := service.NewUserService(repo)
-	u := web.NewUserHandler(svc)
+	codeCache := cache2.NewCodeCache(client)
+	codeRepo := repository.NewCodeRepository(codeCache)
+	smsClient := tencent.NewService()
+	codeSvc := captcha.NewCodeService(codeRepo, smsClient)
+	u := web.NewUserHandler(svc, codeSvc)
 	server = web.RegisterRouters(server, u)
 	server.Run(":8080")
 }

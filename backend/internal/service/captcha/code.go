@@ -18,9 +18,10 @@ type CodeService struct {
 	tplId string
 }
 
-func NewCodeService(r *repository.CodeRepository) *CodeService {
+func NewCodeService(r *repository.CodeRepository, smsClient sms.Service) *CodeService {
 	return &CodeService{
 		repo: r,
+		sms:  smsClient,
 	}
 }
 

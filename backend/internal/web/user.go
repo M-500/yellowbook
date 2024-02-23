@@ -10,6 +10,7 @@ import (
 	"backend/internal/domain"
 	"backend/internal/repository"
 	"backend/internal/service"
+	"backend/internal/service/captcha"
 	"fmt"
 	"github.com/dlclark/regexp2"
 	"github.com/gin-contrib/sessions"
@@ -28,15 +29,17 @@ type UserHandler struct {
 	svc          *service.UserService
 	emailCompile *regexp2.Regexp
 	pwdCompile   *regexp2.Regexp
+	codeSvc      *captcha.CodeService
 }
 
-func NewUserHandler(svc *service.UserService) *UserHandler {
+func NewUserHandler(svc *service.UserService, codeSvc *captcha.CodeService) *UserHandler {
 	emailCompile := regexp2.MustCompile(emailRegexPattern, regexp2.Debug) // 预编译正则表达式
 	pwdCompile := regexp2.MustCompile(pwdRegexPattern, regexp2.Debug)     // 预编译正则
 	return &UserHandler{
 		svc:          svc,
 		emailCompile: emailCompile,
 		pwdCompile:   pwdCompile,
+		codeSvc:      codeSvc,
 	}
 }
 func (u *UserHandler) SignUp(ctx *gin.Context) {
@@ -205,6 +208,12 @@ func (u *UserHandler) Profile(ctx *gin.Context) {
 }
 
 func (u *UserHandler) Edit(ctx *gin.Context) {
+}
+
+func (u *UserHandler) SendSMSLoginCode(ctx *gin.Context) {
+}
+
+func (u *UserHandler) LoginSMS(ctx *gin.Context) {
 }
 
 type UserClaims struct {

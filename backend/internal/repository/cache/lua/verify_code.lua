@@ -17,7 +17,7 @@ elseif expectedCode == redisCode then
     return 0
 else
     -- 验证码不匹配，需要重新输入 需要减少重试次数
-    redis.call("decr",key,-1)
+    redis.call("decr",key)
     return -2
 end
 -- 1. 是否存在key
