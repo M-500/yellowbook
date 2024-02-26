@@ -4,6 +4,7 @@ import (
 	"context"
 	"gin-web/internal/domain"
 	"gin-web/internal/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // @Description
@@ -28,8 +29,13 @@ type UserService struct {
 }
 
 func (u2 UserService) Signup(ctx context.Context, u domain.DMUser) error {
-	//TODO implement me
-	panic("implement me")
+	// 1. 密码加密
+	ciphertext, err := bcrypt.GenerateFromPassword([]byte(u.Pwd), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	u.Pwd = string(ciphertext)
+	return u2.userRepo.Create(ctx, u)
 }
 
 func (u2 UserService) FindOrCreate(ctx context.Context, phone string) (domain.DMUser, error) {

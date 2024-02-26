@@ -2,12 +2,20 @@ package dao
 
 import (
 	"context"
+	"errors"
+	"github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
 )
 
 // @Description
 // @Author 代码小学生王木木
 // @Date 2024-02-26 15:50
+
+// ErrDataNotFound 通用的数据没找到
+var ErrDataNotFound = gorm.ErrRecordNotFound
+
+// ErrUserDuplicate 这个算是 user 专属的
+var ErrUserDuplicate = errors.New("用户邮箱或者手机号冲突")
 
 type UserDaoInterface interface {
 	Insert(ctx context.Context, u UserModel) error
@@ -23,8 +31,14 @@ type UserDAO struct {
 }
 
 func (u2 UserDAO) Insert(ctx context.Context, u UserModel) error {
-	//TODO implement me
-	panic("implement me")
+	err := u2.db.WithContext(ctx).Create(&u).Error
+	if me, ok := err.(*mysql.MySQLError); ok {
+		const uniqueIndexErrNo uint16 = 1062
+		if me.Number == uniqueIndexErrNo {
+			return ErrUserDuplicate
+		}
+	}
+	return err
 }
 
 func (u2 UserDAO) UpdateNonZeroFields(ctx context.Context, u UserModel) error {

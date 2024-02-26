@@ -10,3 +10,5 @@ docker:
 	@GOOS=linux GOARCH=arm go build -tags=k8s -o webook .
 	# 这里你可以随便改这个标签，记得对应的 k8s 部署里面也要改
 	@docker build -t flycash/webook:v0.0.1 .
+
+	@mockgen  -source=E:/workspace/test/testing_go/servic.go -destination=E:/workspace/test/testing_go/mockers/service.mock.go

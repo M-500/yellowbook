@@ -27,8 +27,12 @@ type UserRepository struct {
 }
 
 func (u2 UserRepository) Create(ctx context.Context, u domain.DMUser) error {
-	//TODO implement me
-	panic("implement me")
+	return u2.userDao.Insert(ctx, dao.UserModel{
+		UserName: u.Username,
+		Phone:    u.Phone,
+		Password: u.Pwd,
+		Birthday: u.BirthDay,
+	})
 }
 
 func (u2 UserRepository) Update(ctx context.Context, u domain.DMUser) error {

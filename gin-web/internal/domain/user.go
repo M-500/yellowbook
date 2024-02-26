@@ -5,6 +5,11 @@ package domain
 // @Date 2024-02-22 18:16
 
 type DMUser struct {
+	Email    string
+	Pwd      string
+	Username string
+	Phone    string
+	BirthDay string
 }
 
 type WechatInfo struct {
