@@ -1,10 +1,12 @@
 package web
 
 import (
+	"fmt"
 	"gin-web/internal/domain"
 	"gin-web/internal/service"
 	"github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 )
 
@@ -97,7 +99,36 @@ func (h *UserHandler) SignUp(c *gin.Context) {
 //	@receiver h
 //	@param c
 func (h *UserHandler) PwdLogin(c *gin.Context) {
+	type PwdLoginReq struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	var pwdForm PwdLoginReq
+	if err := c.Bind(&pwdForm); err != nil {
+		c.String(http.StatusUnauthorized, "数据不合法")
+		return
+	}
+	domainU, err := h.userSvc.Login(c, pwdForm.Email, pwdForm.Password)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"msg": "系统内部错误"})
+		return
+	}
+	// 登录成功后 生成一个JWT
 
+	claims := domain.UserClaims{
+		RegisteredClaims: jwt.RegisteredClaims{},
+		UserId:           int64(domainU.Id),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodES512, claims)
+	tokenStr, err := token.SignedString([]byte("wulinlin"))
+	if err != nil {
+		c.String(http.StatusInternalServerError, "系统错误")
+		return
+	}
+	c.Header("x-jwt-token", tokenStr)
+	fmt.Println(tokenStr, "哈哈")
+	c.JSON(http.StatusOK, gin.H{"msg": "登录成功！"})
+	return
 }
 
 // PhoneLogin
