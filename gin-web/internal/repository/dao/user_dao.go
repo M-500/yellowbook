@@ -30,6 +30,11 @@ type UserDAO struct {
 	db *gorm.DB
 }
 
+func NewUserDAO(db *gorm.DB) *UserDAO {
+	return &UserDAO{
+		db: db,
+	}
+}
 func (u2 UserDAO) Insert(ctx context.Context, u UserModel) error {
 	err := u2.db.WithContext(ctx).Create(&u).Error
 	if me, ok := err.(*mysql.MySQLError); ok {
@@ -47,27 +52,25 @@ func (u2 UserDAO) UpdateNonZeroFields(ctx context.Context, u UserModel) error {
 }
 
 func (u2 UserDAO) FindByPhone(ctx context.Context, phone string) (UserModel, error) {
-	//TODO implement me
-	panic("implement me")
+	userModel := UserModel{}
+	err := u2.db.WithContext(ctx).Where("`phone` = ?", phone).First(&userModel).Error
+	return userModel, err
 }
 
 func (u2 UserDAO) FindByEmail(ctx context.Context, email string) (UserModel, error) {
-	//TODO implement me
-	panic("implement me")
+	userModel := UserModel{}
+	err := u2.db.WithContext(ctx).Where("`email` = ?", email).First(&userModel).Error
+	return userModel, err
 }
 
 func (u2 UserDAO) FindByWechat(ctx context.Context, openId string) (UserModel, error) {
-	//TODO implement me
-	panic("implement me")
+	userModel := UserModel{}
+	err := u2.db.WithContext(ctx).Where("`open_id` = ?", openId).First(&userModel).Error
+	return userModel, err
 }
 
 func (u2 UserDAO) FindById(ctx context.Context, id int64) (UserModel, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func NewUserDAO(db *gorm.DB) *UserDAO {
-	return &UserDAO{
-		db: db,
-	}
+	u := UserModel{}
+	err := u2.db.WithContext(ctx).Where("`id` = ?", id).First(&u).Error
+	return u, err
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"gin-web/internal/domain"
 	"gin-web/internal/repository"
 	"golang.org/x/crypto/bcrypt"
@@ -44,8 +45,18 @@ func (u2 UserService) FindOrCreate(ctx context.Context, phone string) (domain.DM
 }
 
 func (u2 UserService) Login(ctx context.Context, email, password string) (domain.DMUser, error) {
-	//TODO implement me
-	panic("implement me")
+	// 查找用户
+	u, err := u2.userRepo.FindByEmail(ctx, email)
+	if err != nil {
+		return domain.DMUser{}, errors.New("用户不存在")
+	}
+	// 校验密码是否正常
+	err = bcrypt.CompareHashAndPassword([]byte(u.Pwd), []byte(password))
+	if err != nil {
+		return domain.DMUser{}, errors.New("密码输入错误")
+	}
+	// 登录成功 返回用户
+	return u, nil
 }
 
 func (u2 UserService) Profile(ctx context.Context, id int64) (domain.DMUser, error) {

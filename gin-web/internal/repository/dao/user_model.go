@@ -12,6 +12,7 @@ type UserModel struct {
 	Phone    string
 	Password string
 	Birthday string
+	Email    string
 }
 
 func (UserModel) TableName() string {

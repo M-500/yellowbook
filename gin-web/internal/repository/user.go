@@ -46,8 +46,18 @@ func (u2 UserRepository) FindByPhone(ctx context.Context, phone string) (domain.
 }
 
 func (u2 UserRepository) FindByEmail(ctx context.Context, email string) (domain.DMUser, error) {
-	//TODO implement me
-	panic("implement me")
+	byEmail, err := u2.userDao.FindByEmail(ctx, email)
+	if err != nil {
+		return domain.DMUser{}, err
+	}
+	return domain.DMUser{
+		Id:       byEmail.ID,
+		Email:    byEmail.Email,
+		Pwd:      byEmail.Password,
+		Username: byEmail.UserName,
+		Phone:    byEmail.Phone,
+		BirthDay: byEmail.Birthday,
+	}, nil
 }
 
 func (u2 UserRepository) FindById(ctx context.Context, id int64) (domain.DMUser, error) {
