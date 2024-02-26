@@ -1,4 +1,4 @@
-package gin_demo
+package main
 
 // @Description
 // @Author 代码小学生王木木
@@ -16,4 +16,8 @@ func NewUserService(userDao *UserDAO) *UserService {
 
 func (svc *UserService) FindByUserName(u string) interface{} {
 	return svc.userDao.FindByUserName(u)
+}
+
+func (svc *UserService) CreateUser(u User) error {
+	return svc.userDao.CreateUser(u)
 }

@@ -10,10 +10,10 @@ import (
 // @Date 2024-02-26 15:49
 
 type UserHandler struct {
-	userSvc *service.UserService
+	userSvc service.UserSvcInterface
 }
 
-func NewUserHandler(svc *service.UserService) *UserHandler {
+func NewUserHandler(svc service.UserSvcInterface) *UserHandler {
 	return &UserHandler{
 		userSvc: svc,
 	}

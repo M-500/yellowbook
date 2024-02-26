@@ -1,4 +1,4 @@
-package gin_demo
+package main
 
 import (
 	"fmt"
@@ -19,7 +19,32 @@ func NewUserHandler(svc *UserService) *UserHandler {
 		svc: svc,
 	}
 }
-
+func (u *UserHandler) SignUp(ctx *gin.Context) {
+	type SignForm struct {
+		Username string `json:"username"`
+		Pwd      string `json:"pwd"`
+	}
+	var user SignForm
+	err := ctx.ShouldBindJSON(&user)
+	if err != nil {
+		ctx.JSON(http.StatusPaymentRequired, gin.H{
+			"msg": "数据不合法",
+		})
+		return
+	}
+	domainU := User{
+		Username: user.Username,
+		Pwd:      user.Pwd,
+	}
+	name := u.svc.FindByUserName(user.Username)
+	if name == nil {
+		_ = u.svc.CreateUser(domainU)
+	}
+	ctx.JSON(http.StatusPaymentRequired, gin.H{
+		"msg": "用户注册成功",
+	})
+	return
+}
 func (u *UserHandler) Login(ctx *gin.Context) {
 	type LoginForm struct {
 		Username string `json:"username"`

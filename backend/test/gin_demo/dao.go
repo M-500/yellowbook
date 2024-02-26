@@ -1,4 +1,4 @@
-package gin_demo
+package main
 
 import "gorm.io/gorm"
 
@@ -17,5 +17,18 @@ func NewUserDAO(db *gorm.DB) *UserDAO {
 }
 
 func (dao *UserDAO) FindByUserName(u string) interface{} {
-	return nil
+	var user User
+	err := dao.db.Where("username = ?", u).First(&user).Error
+	if err != nil {
+		return err
+	}
+	return user
+}
+
+func (dao *UserDAO) CreateUser(u User) error {
+	err := dao.db.Create(User{
+		Username: u.Username,
+		Pwd:      u.Pwd,
+	}).Error
+	return err
 }
