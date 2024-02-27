@@ -9,8 +9,8 @@ import "github.com/redis/go-redis/v9"
 func InitRedis() redis.Cmdable {
 	// 初始化redis连接
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:    "192.16.1.52:6379",
-		Network: "tcp",
+		Addr: "192.168.1.52:6379",
+		DB:   8,
 	})
 	return redisClient
 }

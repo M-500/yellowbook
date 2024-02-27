@@ -30,7 +30,7 @@ type CodeCache struct {
 	redis redis.Cmdable
 }
 
-func NewCodeCache(cmd redis.Cmdable) *CodeCache {
+func NewCodeCache(cmd redis.Cmdable) ICodeCache {
 	return &CodeCache{
 		redis: cmd,
 	}
@@ -45,7 +45,8 @@ func (c *CodeCache) Set(ctx context.Context,
 	biz string,
 	phone string,
 	code string) error {
-	res, err := c.redis.Eval(ctx, luaSetCode, []string{c.key(biz, phone)}, code).Int()
+	key := c.key(biz, phone)
+	res, err := c.redis.Eval(ctx, luaSetCode, []string{key}, code).Int()
 	if err != nil {
 		return err
 	}

@@ -6,7 +6,7 @@ package repository
 
 import (
 	"context"
-	"github.com/redis/go-redis/v9"
+	"gin-web/internal/repository/cache"
 )
 
 type ICodeRepo interface {
@@ -15,21 +15,20 @@ type ICodeRepo interface {
 }
 
 type CodeRepository struct {
-	client redis.Cmdable
+	cache cache.ICodeCache
 }
 
-func NewCodeRepository(client redis.Cmdable) ICodeRepo {
+func NewCodeRepository(client cache.ICodeCache) ICodeRepo {
 	return &CodeRepository{
-		client: client,
+		cache: client,
 	}
 }
 
-func (c CodeRepository) Store(ctx context.Context, biz string, phone string, code string) error {
-	//TODO implement me
-	panic("implement me")
+func (c *CodeRepository) Store(ctx context.Context, biz string, phone string, code string) error {
+
+	return c.cache.Set(ctx, biz, phone, code)
 }
 
-func (c CodeRepository) Verify(ctx context.Context, biz string, phone string, inputCode string) (bool, error) {
-	//TODO implement me
-	panic("implement me")
+func (c *CodeRepository) Verify(ctx context.Context, biz string, phone string, inputCode string) (bool, error) {
+	return c.cache.Verify(ctx, biz, phone, inputCode)
 }

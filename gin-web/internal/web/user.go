@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gin-web/internal/domain"
 	"gin-web/internal/service"
-	"gin-web/internal/service/sms"
 	"github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -17,7 +16,7 @@ import (
 
 type UserHandler struct {
 	userSvc      service.IUserService
-	codeSvc      sms.ISMSService
+	codeSvc      service.ICodeService
 	emailCompile *regexp2.Regexp
 	pwdCompile   *regexp2.Regexp
 	phoneCompile *regexp2.Regexp
@@ -32,7 +31,7 @@ const (
 	bizLogin          = "login"
 )
 
-func NewUserHandler(svc service.IUserService, codeSvc sms.ISMSService) *UserHandler {
+func NewUserHandler(svc service.IUserService, codeSvc service.ICodeService) *UserHandler {
 	emailCompile := regexp2.MustCompile(emailRegexPattern, regexp2.Debug) // 预编译正则表达式
 	pwdCompile := regexp2.MustCompile(pwdRegexPattern, regexp2.Debug)     // 预编译正则
 	phoneCompile := regexp2.MustCompile(phoneRegexPattern, regexp2.Debug) // 预编译正则
@@ -158,19 +157,19 @@ func (h *UserHandler) SMSSender(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "数据不合法")
 		return
 	}
-	// 正则匹配手机号是否合法
-	ok, err := h.emailCompile.MatchString(smsForm.Phone)
-	if err != nil {
-		// 正则匹配失败会返回Error
-		c.JSON(http.StatusOK, gin.H{"msg": "系统内部错误"})
-		return
-	}
-	if !ok {
-		// 正则校验不通过，直接返回
-		c.JSON(http.StatusOK, gin.H{"msg": "手机号码不合法"})
-		return
-	}
-	err = h.codeSvc.Send(c, bizLogin, []string{smsForm.Phone})
+	//// 正则匹配手机号是否合法
+	//ok, err := h.emailCompile.MatchString(smsForm.Phone)
+	//if err != nil {
+	//	// 正则匹配失败会返回Error
+	//	c.JSON(http.StatusOK, gin.H{"msg": "系统内部错误"})
+	//	return
+	//}
+	//if !ok {
+	//	// 正则校验不通过，直接返回
+	//	c.JSON(http.StatusOK, gin.H{"msg": "手机号码不合法"})
+	//	return
+	//}
+	err := h.codeSvc.Send(c, bizLogin, smsForm.Phone)
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, Result{Msg: "发送成功"})

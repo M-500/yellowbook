@@ -13,7 +13,7 @@ func RegisterRouters(engine *gin.Engine, u *UserHandler) *gin.Engine {
 	engine.POST("/users/login-jwt", u.PwdLogin) // 用户登录
 	//engine.GET("/users/profile", u.Profile)                 // 上传头像
 	//engine.POST("/users/edit", u.Edit)                      // 编辑信息
-	//engine.POST("/login-sms/code/send", u.SendSMSLoginCode) // 编辑信息
+	engine.POST("/login-sms/code/send", u.SMSSender) // 编辑信息
 	//engine.POST("/login-sms", u.LoginSMS)                   // 编辑信息
 
 	return engine

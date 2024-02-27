@@ -1,9 +1,11 @@
 //go:build wireinject
 
-package ioc
+package main
 
 import (
+	"gin-web/internal/ioc"
 	"gin-web/internal/repository"
+	"gin-web/internal/repository/cache"
 	"gin-web/internal/repository/dao"
 	"gin-web/internal/service"
 	"gin-web/internal/web"
@@ -17,20 +19,24 @@ import (
 
 func InitWebServer() *gin.Engine {
 	wire.Build(
-		InitDB,
-		InitRedis,
+		ioc.InitDB,
+		ioc.InitRedis,
 
+		cache.NewCodeCache,
 		dao.NewUserDAO,
 
 		repository.NewUserRepository,
+		repository.NewCodeRepository,
 
+		service.NewCodeService,
 		service.NewUserService,
 
 		web.NewUserHandler,
 
 		// 你中间件呢？注册路由呢
-		InitGin,
-		InitMiddlewares,
+		ioc.InitGin,
+		ioc.InitMiddlewares,
+		ioc.InitSmsService,
 	)
 
 	return new(gin.Engine)

@@ -1,7 +1,25 @@
+package main
 
--- 你的验证码在 Redis 上的 Key
--- phone_code:login:185xxxx
-local key = KEYS[1]
+import (
+	"context"
+	"fmt"
+	"github.com/redis/go-redis/v9"
+)
+
+// @Description
+// @Author 代码小学生王木木
+// @Date 2024-02-27 17:25
+
+func main() {
+	client := redis.NewClient(&redis.Options{
+		Addr: "192.168.1.52:6379",
+		DB:   8,
+	})
+	// 关闭连接
+	defer client.Close()
+	// 定义 Lua 脚本
+	luaScript := `
+        local key = KEYS[1]
 -- 验证次数，一个验证码 校验三次失败，无法再用
 
 local cntKey = key..":cnt"
@@ -23,3 +41,12 @@ else
     -- 发送太频繁
     return -1
 end
+    `
+	// 执行 Lua 脚本
+	result, err := client.Eval(context.Background(), luaScript, []string{"phone:login:cnt"}, 123456).Result()
+	if err != nil {
+		fmt.Println("Error executing Lua script:", err)
+		return
+	}
+	fmt.Println("Lua script result:", result)
+}
