@@ -5,11 +5,10 @@ package main
 // @Date 2024-02-22 10:12
 
 import (
-	"github.com/gin-gonic/gin"
+	"gin-web/internal/ioc"
 )
 
 func main() {
-	server := gin.Default()
-	//userDao := dao.NewUserDAO()
+	server := ioc.InitWebServer()
 	server.Run(":8081")
 }

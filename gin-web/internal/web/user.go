@@ -15,7 +15,7 @@ import (
 // @Date 2024-02-26 15:49
 
 type UserHandler struct {
-	userSvc      service.UserSvcInterface
+	userSvc      service.IUserService
 	emailCompile *regexp2.Regexp
 	pwdCompile   *regexp2.Regexp
 }
@@ -26,7 +26,7 @@ const (
 	pwdRegexPattern   = "^(?![a-zA-Z]+$)(?!\\d+$)(?![^\\da-zA-Z\\s]+$).{6,32}$"                 // 由字母、数字、特殊字符，任意2种组成，6-32位
 )
 
-func NewUserHandler(svc service.UserSvcInterface) *UserHandler {
+func NewUserHandler(svc service.IUserService) *UserHandler {
 	emailCompile := regexp2.MustCompile(emailRegexPattern, regexp2.Debug) // 预编译正则表达式
 	pwdCompile := regexp2.MustCompile(pwdRegexPattern, regexp2.Debug)     // 预编译正则
 	return &UserHandler{
@@ -34,6 +34,10 @@ func NewUserHandler(svc service.UserSvcInterface) *UserHandler {
 		emailCompile: emailCompile,
 		pwdCompile:   pwdCompile,
 	}
+}
+
+func (h *UserHandler) RegisterRouters() {
+
 }
 
 // SignUp

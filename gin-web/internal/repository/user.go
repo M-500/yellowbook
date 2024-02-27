@@ -10,7 +10,7 @@ import (
 // @Author 代码小学生王木木
 // @Date 2024-02-26 15:53
 
-type UserRepoInterface interface {
+type IUserRepository interface {
 	Create(ctx context.Context, u domain.DMUser) error
 	// Update 更新数据，只有非 0 值才会更新
 	Update(ctx context.Context, u domain.DMUser) error
@@ -23,10 +23,16 @@ type UserRepoInterface interface {
 }
 
 type UserRepository struct {
-	userDao dao.UserDaoInterface
+	userDao dao.IUserDao
 }
 
-func (u2 UserRepository) Create(ctx context.Context, u domain.DMUser) error {
+func NewUserRepository(userDao dao.IUserDao) IUserRepository {
+	return &UserRepository{
+		userDao: userDao,
+	}
+}
+
+func (u2 *UserRepository) Create(ctx context.Context, u domain.DMUser) error {
 	return u2.userDao.Insert(ctx, dao.UserModel{
 		UserName: u.Username,
 		Phone:    u.Phone,
@@ -35,17 +41,17 @@ func (u2 UserRepository) Create(ctx context.Context, u domain.DMUser) error {
 	})
 }
 
-func (u2 UserRepository) Update(ctx context.Context, u domain.DMUser) error {
+func (u2 *UserRepository) Update(ctx context.Context, u domain.DMUser) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (u2 UserRepository) FindByPhone(ctx context.Context, phone string) (domain.DMUser, error) {
+func (u2 *UserRepository) FindByPhone(ctx context.Context, phone string) (domain.DMUser, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (u2 UserRepository) FindByEmail(ctx context.Context, email string) (domain.DMUser, error) {
+func (u2 *UserRepository) FindByEmail(ctx context.Context, email string) (domain.DMUser, error) {
 	byEmail, err := u2.userDao.FindByEmail(ctx, email)
 	if err != nil {
 		return domain.DMUser{}, err
@@ -60,18 +66,12 @@ func (u2 UserRepository) FindByEmail(ctx context.Context, email string) (domain.
 	}, nil
 }
 
-func (u2 UserRepository) FindById(ctx context.Context, id int64) (domain.DMUser, error) {
+func (u2 *UserRepository) FindById(ctx context.Context, id int64) (domain.DMUser, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (u2 UserRepository) FindByWechat(ctx context.Context, openId string) (domain.DMUser, error) {
+func (u2 *UserRepository) FindByWechat(ctx context.Context, openId string) (domain.DMUser, error) {
 	//TODO implement me
 	panic("implement me")
-}
-
-func NewUserRepository(userDao dao.UserDaoInterface) *UserRepository {
-	return &UserRepository{
-		userDao: userDao,
-	}
 }

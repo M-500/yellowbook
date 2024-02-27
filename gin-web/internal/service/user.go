@@ -11,7 +11,7 @@ import (
 // @Description
 // @Author 代码小学生王木木
 // @Date 2024-02-22 18:15
-type UserSvcInterface interface {
+type IUserService interface {
 	Signup(ctx context.Context, u domain.DMUser) error
 	FindOrCreate(ctx context.Context, phone string) (domain.DMUser, error)
 	Login(ctx context.Context, email, password string) (domain.DMUser, error)
@@ -26,10 +26,15 @@ type UserSvcInterface interface {
 }
 
 type UserService struct {
-	userRepo *repository.UserRepository
+	userRepo repository.IUserRepository
 }
 
-func (u2 UserService) Signup(ctx context.Context, u domain.DMUser) error {
+func NewUserService(userRepo repository.IUserRepository) IUserService {
+	return &UserService{
+		userRepo: userRepo,
+	}
+}
+func (u2 *UserService) Signup(ctx context.Context, u domain.DMUser) error {
 	// 1. 密码加密
 	ciphertext, err := bcrypt.GenerateFromPassword([]byte(u.Pwd), bcrypt.DefaultCost)
 	if err != nil {
@@ -39,12 +44,12 @@ func (u2 UserService) Signup(ctx context.Context, u domain.DMUser) error {
 	return u2.userRepo.Create(ctx, u)
 }
 
-func (u2 UserService) FindOrCreate(ctx context.Context, phone string) (domain.DMUser, error) {
+func (u2 *UserService) FindOrCreate(ctx context.Context, phone string) (domain.DMUser, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (u2 UserService) Login(ctx context.Context, email, password string) (domain.DMUser, error) {
+func (u2 *UserService) Login(ctx context.Context, email, password string) (domain.DMUser, error) {
 	// 查找用户
 	u, err := u2.userRepo.FindByEmail(ctx, email)
 	if err != nil {
@@ -59,23 +64,17 @@ func (u2 UserService) Login(ctx context.Context, email, password string) (domain
 	return u, nil
 }
 
-func (u2 UserService) Profile(ctx context.Context, id int64) (domain.DMUser, error) {
+func (u2 *UserService) Profile(ctx context.Context, id int64) (domain.DMUser, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (u2 UserService) UpdateNonSensitiveInfo(ctx context.Context, user domain.DMUser) error {
+func (u2 *UserService) UpdateNonSensitiveInfo(ctx context.Context, user domain.DMUser) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (u2 UserService) FindOrCreateByWechat(ctx context.Context, info domain.WechatInfo) (domain.DMUser, error) {
+func (u2 *UserService) FindOrCreateByWechat(ctx context.Context, info domain.WechatInfo) (domain.DMUser, error) {
 	//TODO implement me
 	panic("implement me")
-}
-
-func NewUserService(userRepo *repository.UserRepository) *UserService {
-	return &UserService{
-		userRepo: userRepo,
-	}
 }
