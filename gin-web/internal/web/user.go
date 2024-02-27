@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gin-web/internal/domain"
 	"gin-web/internal/service"
+	"gin-web/internal/service/sms"
 	"github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -16,28 +17,32 @@ import (
 
 type UserHandler struct {
 	userSvc      service.IUserService
+	codeSvc      sms.ISMSService
 	emailCompile *regexp2.Regexp
 	pwdCompile   *regexp2.Regexp
+	phoneCompile *regexp2.Regexp
 }
 
 // 邮箱校验验证码
 const (
-	emailRegexPattern = "^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z0-9]{2,6}$" // 邮箱
-	pwdRegexPattern   = "^(?![a-zA-Z]+$)(?!\\d+$)(?![^\\da-zA-Z\\s]+$).{6,32}$"                 // 由字母、数字、特殊字符，任意2种组成，6-32位
+	emailRegexPattern = "^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z0-9]{2,6}$"           // 邮箱
+	pwdRegexPattern   = "^(?![a-zA-Z]+$)(?!\\d+$)(?![^\\da-zA-Z\\s]+$).{6,32}$"                           // 由字母、数字、特殊字符，任意2种组成，6-32位
+	phoneRegexPattern = "/^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$/" // 由字母、数字、特殊字符，任意2种组成，6-32位
+	userIdKey         = "userId"
+	bizLogin          = "login"
 )
 
-func NewUserHandler(svc service.IUserService) *UserHandler {
+func NewUserHandler(svc service.IUserService, codeSvc sms.ISMSService) *UserHandler {
 	emailCompile := regexp2.MustCompile(emailRegexPattern, regexp2.Debug) // 预编译正则表达式
 	pwdCompile := regexp2.MustCompile(pwdRegexPattern, regexp2.Debug)     // 预编译正则
+	phoneCompile := regexp2.MustCompile(phoneRegexPattern, regexp2.Debug) // 预编译正则
 	return &UserHandler{
 		userSvc:      svc,
+		codeSvc:      codeSvc,
 		emailCompile: emailCompile,
+		phoneCompile: phoneCompile,
 		pwdCompile:   pwdCompile,
 	}
-}
-
-func (h *UserHandler) RegisterRouters() {
-
 }
 
 // SignUp
@@ -142,4 +147,38 @@ func (h *UserHandler) PwdLogin(c *gin.Context) {
 //	@param c
 func (h *UserHandler) PhoneLogin(c *gin.Context) {
 
+}
+
+func (h *UserHandler) SMSSender(c *gin.Context) {
+	type SmsSendForm struct {
+		Phone string `json:"phone"`
+	}
+	var smsForm SmsSendForm
+	if err := c.Bind(&smsForm); err != nil {
+		c.String(http.StatusUnauthorized, "数据不合法")
+		return
+	}
+	// 正则匹配手机号是否合法
+	ok, err := h.emailCompile.MatchString(smsForm.Phone)
+	if err != nil {
+		// 正则匹配失败会返回Error
+		c.JSON(http.StatusOK, gin.H{"msg": "系统内部错误"})
+		return
+	}
+	if !ok {
+		// 正则校验不通过，直接返回
+		c.JSON(http.StatusOK, gin.H{"msg": "手机号码不合法"})
+		return
+	}
+	err = h.codeSvc.Send(c, bizLogin, []string{smsForm.Phone})
+	switch err {
+	case nil:
+		c.JSON(http.StatusOK, Result{Msg: "发送成功"})
+	//case service.ErrCodeSendTooMany:
+	//	c.JSON(http.StatusOK, Result{Msg: "短信发送太频繁，请稍后再试"})
+	default:
+		c.JSON(http.StatusOK, Result{Code: 5, Msg: "系统错误"})
+		// 要打印日志
+		return
+	}
 }

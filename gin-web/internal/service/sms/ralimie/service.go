@@ -14,11 +14,11 @@ import (
 )
 
 type RatelimitSMSService struct {
-	svc     sms.SMSInterface // 组合原有接口
+	svc     sms.ISMSService // 组合原有接口
 	limiter retelimiter.Limiter
 }
 
-func NewService(svc sms.SMSInterface, limiter retelimiter.Limiter) sms.SMSInterface {
+func NewService(svc sms.ISMSService, limiter retelimiter.Limiter) sms.ISMSService {
 	return &RatelimitSMSService{
 		svc:     svc,
 		limiter: limiter,

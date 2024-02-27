@@ -41,6 +41,7 @@ func (u2 *UserService) Signup(ctx context.Context, u domain.DMUser) error {
 		return err
 	}
 	u.Pwd = string(ciphertext)
+	// 这里要判断错误，用户是否已存在
 	return u2.userRepo.Create(ctx, u)
 }
 

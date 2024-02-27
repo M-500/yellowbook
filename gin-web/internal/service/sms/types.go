@@ -8,6 +8,6 @@ package sms
 
 import "context"
 
-type SMSInterface interface {
+type ISMSService interface {
 	Send(ctx context.Context, tpl string, args []string, numbers ...string) error
 }
