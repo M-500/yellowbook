@@ -14,6 +14,7 @@ if ttl == -1 then
     -- key 存在 但是没有过期时间，可能是技术人为处理的
     return -2
 elseif ttl== -2 or ttl < 540 then
+    -- key 不存在，那么就设置这个key 并设置过期时间
     redis.call("set", key,val)
     redis.call("expire",key,600)
     redis.call("set",cntKey,3)
