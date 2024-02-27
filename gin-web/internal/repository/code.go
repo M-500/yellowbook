@@ -9,6 +9,11 @@ import (
 	"gin-web/internal/repository/cache"
 )
 
+var (
+	ErrCodeSendTooMany        = cache.ErrCodeSendTooMany
+	ErrCodeVerifyTooManyTimes = cache.ErrCodeVerifyTooManyTimes
+)
+
 type ICodeRepo interface {
 	Store(ctx context.Context, biz string, phone string, code string) error
 	Verify(ctx context.Context, biz, phone, inputCode string) (bool, error)

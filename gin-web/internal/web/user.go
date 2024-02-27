@@ -13,6 +13,7 @@ import (
 // @Description
 // @Author 代码小学生王木木
 // @Date 2024-02-26 15:49
+const biz = "login"
 
 type UserHandler struct {
 	userSvc      service.IUserService
@@ -144,8 +145,49 @@ func (h *UserHandler) PwdLogin(c *gin.Context) {
 //	@Description: 手机验证码登录
 //	@receiver h
 //	@param c
-func (h *UserHandler) PhoneLogin(c *gin.Context) {
+func (h *UserHandler) PhoneLogin(ctx *gin.Context) {
+	type Req struct {
+		Phone string `json:"phone"`
+		Code  string `json:"code"`
+	}
+	var req Req
+	if err := ctx.Bind(&req); err != nil {
+		return
+	}
+	// 要不要查询数据库是否存在该手机号
+	// 1. 校验手机号
+	verify, err := h.codeSvc.Verify(ctx, biz, req.Phone, req.Code)
+	if err != nil {
+		ctx.JSON(http.StatusOK, Result{
+			Code: 5,
+			Msg:  "系统错误",
+		})
+		return
+	}
+	if !verify {
+		// 校验不通过
+		ctx.JSON(http.StatusOK, Result{
+			Code: 4,
+			Msg:  "验证码有误",
+		})
+		return
+	}
+	// 我这个手机号，会不会是一个新用户呢？
+	// 这样子
+	user, err := h.userSvc.FindOrCreate(ctx, req.Phone)
+	if err != nil {
+		ctx.JSON(http.StatusOK, Result{
+			Code: 5,
+			Msg:  "系统错误",
+		})
+		return
+	}
+	fmt.Println(user)
+	// 3. 组装JWT
 
+	ctx.JSON(http.StatusOK, Result{
+		Msg: "验证码校验通过",
+	})
 }
 
 func (h *UserHandler) SMSSender(c *gin.Context) {
@@ -173,8 +215,8 @@ func (h *UserHandler) SMSSender(c *gin.Context) {
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, Result{Msg: "发送成功"})
-	//case service.ErrCodeSendTooMany:
-	//	c.JSON(http.StatusOK, Result{Msg: "短信发送太频繁，请稍后再试"})
+	case service.ErrCodeSendTooMany:
+		c.JSON(http.StatusOK, Result{Msg: "短信发送太频繁，请稍后再试"})
 	default:
 		c.JSON(http.StatusOK, Result{Code: 5, Msg: "系统错误"})
 		// 要打印日志

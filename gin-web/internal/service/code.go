@@ -14,6 +14,10 @@ import (
 // @Date 2024-02-26 19:39
 
 var codeTplId atomic.String = atomic.String{}
+var (
+	ErrCodeVerifyTooManyTimes = repository.ErrCodeVerifyTooManyTimes
+	ErrCodeSendTooMany        = repository.ErrCodeSendTooMany
+)
 
 type ICodeService interface {
 	Send(ctx context.Context,

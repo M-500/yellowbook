@@ -14,7 +14,7 @@ func RegisterRouters(engine *gin.Engine, u *UserHandler) *gin.Engine {
 	//engine.GET("/users/profile", u.Profile)                 // 上传头像
 	//engine.POST("/users/edit", u.Edit)                      // 编辑信息
 	engine.POST("/login-sms/code/send", u.SMSSender) // 编辑信息
-	//engine.POST("/login-sms", u.LoginSMS)                   // 编辑信息
+	engine.POST("/login-sms", u.PhoneLogin)          // 编辑信息
 
 	return engine
 }
