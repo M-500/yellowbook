@@ -29,7 +29,7 @@ func NewFailOverSMSServiceV1(smsClient []sms.ISMSService) sms.ISMSService {
 // 这么做的目的是不要让他从0 开始 而是从idx的下一个开始
 func (f *FailOverSMSServiceV1) Send(ctx context.Context, tpl string, args []string, numbers ...string) error {
 	// 取下一个节点来作为起始节点
-	idx := atomic.AddUint64(&f.idx, 1) // 这是一个原子操作 是轻量级的并发控制工具
+	idx := atomic.AddUint64(&f.idx, 1) // 这是一个原子 +1 操作 是轻量级的并发控制工具
 	length := uint64(len(f.sms))
 	for i := idx; i < idx+length; i++ {
 		svc := f.sms[int(i%length)] // 取模为了防止下标越界
