@@ -13,6 +13,8 @@ import (
 	"gin-web/pkg/ginx/retelimiter"
 )
 
+var errLimited = fmt.Errorf("触发了限流")
+
 type RatelimitSMSService struct {
 	svc     sms.ISMSService // 组合原有接口
 	limiter retelimiter.Limiter
@@ -46,7 +48,7 @@ func (s *RatelimitSMSService) Send(ctx context.Context, tpl string, args []strin
 	}
 	if limited {
 		// 被限流了
-		return fmt.Errorf("触发了限流")
+		return errLimited
 	}
 	err = s.svc.Send(ctx, tpl, args, numbers...)
 	// 后面加功能

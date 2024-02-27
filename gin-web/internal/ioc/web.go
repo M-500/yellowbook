@@ -2,8 +2,10 @@ package ioc
 
 import (
 	"gin-web/internal/web"
+	"gin-web/pkg/ginx/middleware/ratelimit"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
+	"time"
 )
 
 // @Description
@@ -24,7 +26,7 @@ func InitGin(hdl *web.UserHandler, mdls []gin.HandlerFunc) *gin.Engine {
 //	@return []gin.HandlerFunc
 func InitMiddlewares(redisClient redis.Cmdable) []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		//ratelimit.NewBuilder(redisClient, time.Minute, 3).Build(), // 限流组件
+		ratelimit.NewBuilder(redisClient, time.Minute, 3).Build(), // 限流组件
 		//middleware.CorsMiddleware(),                               // 跨域中间件
 		//middleware.NewLoginMiddlewareBuilder().
 		//	IgnorePath("/user/login").
