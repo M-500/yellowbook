@@ -12,6 +12,7 @@ local now = tonumber(ARGV[3])
 -- 窗口的起始时间
 local min = now - window
 
+-- 该命令会删除有序集合中分数在指定范围内的所有成员。如果有序集合不存在，该命令将返回 0；如果指定范围内有成员被成功删除，该命令将返回被删除的成员的数量。
 redis.call('ZREMRANGEBYSCORE', key, '-inf', min)
 local cnt = redis.call('ZCOUNT', key, '-inf', '+inf')
 -- local cnt = redis.call('ZCOUNT', key, min, '+inf')

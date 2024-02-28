@@ -9,6 +9,7 @@ package tencent
 import (
 	"context"
 	"fmt"
+	sms2 "gin-web/internal/service/sms"
 	"gin-web/pkg/ginx/retelimiter"
 	"github.com/ecodeclub/ekit"
 	"github.com/ecodeclub/ekit/slice"
@@ -22,7 +23,7 @@ type Service struct {
 	limiter  retelimiter.Limiter
 }
 
-func NewService(appId string, signName string, client *sms.Client, limiter retelimiter.Limiter) *Service {
+func NewService(appId string, signName string, client *sms.Client, limiter retelimiter.Limiter) sms2.ISMSService {
 	return &Service{
 		appId:    ekit.ToPtr[string](appId),
 		signName: ekit.ToPtr[string](signName),
