@@ -13,14 +13,12 @@ import (
 	"gin-web/pkg/ginx/retelimiter"
 )
 
-var errLimited = fmt.Errorf("触发了限流")
-
 type RatelimitSMSService struct {
-	svc     sms.ISMSService // 组合原有接口
+	svc     sms.SMSInterface // 组合原有接口
 	limiter retelimiter.Limiter
 }
 
-func NewService(svc sms.ISMSService, limiter retelimiter.Limiter) sms.ISMSService {
+func NewService(svc sms.SMSInterface, limiter retelimiter.Limiter) sms.SMSInterface {
 	return &RatelimitSMSService{
 		svc:     svc,
 		limiter: limiter,
@@ -28,8 +26,7 @@ func NewService(svc sms.ISMSService, limiter retelimiter.Limiter) sms.ISMSServic
 }
 
 // Send
-//-=-【=排、、
- 。
+//
 //	@Description: 药医不死病 ，佛都有缘人
 //	@receiver s
 //	@param ctx
@@ -49,7 +46,7 @@ func (s *RatelimitSMSService) Send(ctx context.Context, tpl string, args []strin
 	}
 	if limited {
 		// 被限流了
-		return errLimited
+		return fmt.Errorf("触发了限流")
 	}
 	err = s.svc.Send(ctx, tpl, args, numbers...)
 	// 后面加功能
