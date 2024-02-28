@@ -44,11 +44,12 @@ func (f *TimeoutFailOverService) Send(ctx context.Context, tpl string, args []st
 	switch err {
 	case context.DeadlineExceeded, context.Canceled: // 超时
 		atomic.AddInt32(&f.cnt, 1)
+		return err
 	case nil:
 		atomic.StoreInt32(&f.cnt, 0) // 你的连续状态被打断了
+		return nil
 	default:
 		// 不知道是什么错误  你可以考虑换下一个
 		return err
 	}
-	return nil
 }
