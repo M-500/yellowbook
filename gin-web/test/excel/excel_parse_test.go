@@ -12,6 +12,7 @@ import (
 // @Date 2024-03-15 18:11
 
 func TestExcelParse(t *testing.T) {
+
 	f, err := excelize.OpenFile("1.xlsx")
 	defer f.Close()
 	if err != nil {
@@ -27,14 +28,23 @@ func TestExcelParse(t *testing.T) {
 	}
 	fmt.Println(len(rows))
 	// 遍历每一行并打印
+	titleMap := make(map[string]int, 10)
 	for i, row := range rows {
-		fmt.Println(i, row)
-		//if i == 0 {
-		//	continue
-		//}
+		if i == 0 {
+			continue
+		}
+		if i == 1 {
+			for ik, cell := range row {
+				titleMap[cell] = ik
+			}
+		}
+
 		//for _, cell := range row {
-		//	fmt.Printf("%s\t", cell)
+		//	fmt.Printf("%s\n", cell)
 		//}
-		//fmt.Println()
+		if i > 1 {
+			break
+		}
+		fmt.Println(titleMap)
 	}
 }
