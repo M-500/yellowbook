@@ -2,20 +2,19 @@ package ioc
 
 import (
 	"gin-web/internal/web"
-	"gin-web/pkg/ginx/middleware/ratelimit"
+	"gin-web/internal/web/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
-	"time"
 )
 
 // @Description
 // @Author 代码小学生王木木
 // @Date 2024-02-27 14:57
 
-func InitGin(hdl *web.UserHandler, mdls []gin.HandlerFunc) *gin.Engine {
+func InitGin(hdl *web.UserHandler, c *web.CaptchaHandler, mdls []gin.HandlerFunc) *gin.Engine {
 	server := gin.Default()
 	server.Use(mdls...)
-	web.RegisterRouters(server, hdl)
+	web.RegisterRouters(server, hdl, c)
 	return server
 }
 
@@ -26,8 +25,8 @@ func InitGin(hdl *web.UserHandler, mdls []gin.HandlerFunc) *gin.Engine {
 //	@return []gin.HandlerFunc
 func InitMiddlewares(redisClient redis.Cmdable) []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		ratelimit.NewBuilder(redisClient, time.Minute, 3).Build(), // 限流组件
-		//middleware.CorsMiddleware(),                               // 跨域中间件
+		//ratelimit.NewBuilder(redisClient, time.Minute, 3).Build(), // 限流组件
+		middleware.CorsMiddleware(), // 跨域中间件
 		//middleware.NewLoginMiddlewareBuilder().
 		//	IgnorePath("/user/login").
 		//	IgnorePath("/login-sms/code/send").

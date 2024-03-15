@@ -29,7 +29,9 @@ func InitWebServer() *gin.Engine {
 	iCodeRepo := repository.NewCodeRepository(iCodeCache)
 	iCodeService := service.NewCodeService(ismsService, iCodeRepo)
 	userHandler := web.NewUserHandler(iUserService, iCodeService)
+	iCaptcha := service.NewCaptchaService()
+	captchaHandler := web.NewCaptchaHandler(iCaptcha)
 	v := ioc.InitMiddlewares(cmdable)
-	engine := ioc.InitGin(userHandler, v)
+	engine := ioc.InitGin(userHandler, captchaHandler, v)
 	return engine
 }

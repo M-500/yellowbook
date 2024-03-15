@@ -30,8 +30,10 @@ func InitWebServer() *gin.Engine {
 
 		service.NewCodeService,
 		service.NewUserService,
+		service.NewCaptchaService,
 
 		web.NewUserHandler,
+		web.NewCaptchaHandler,
 
 		// 你中间件呢？注册路由呢
 		ioc.InitGin,
