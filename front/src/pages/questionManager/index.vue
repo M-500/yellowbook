@@ -5,26 +5,16 @@
         <!--        顶部搜索-->
         <el-form ref="form" :model="form" inline>
           <el-form-item>
-            <el-input
-                class="top_search"
-                maxlength="10"
-                prefix-icon="el-icon-search"
-                placeholder="请输入问题(关键字)搜索"
-                @input="searchQuestion"
-                v-model="form.searchKey"
-                size="small"
-                clearable
-            >
+            <el-input class="top_search" maxlength="10" prefix-icon="el-icon-search" placeholder="请输入问题(关键字)搜索" @input="searchQuestion" v-model="form.searchKey" size="small" clearable>
             </el-input>
           </el-form-item>
           <el-form-item label="问答类别">
             <el-select v-model="form.searchType" clearable size="small" @change="searchQuestion" placeholder="请选择问答类别">
-              <el-option  v-for="(item,index) in categories" :key="index" :label="item.name" :value="item.id"></el-option>
+              <el-option v-for="(item,index) in categories" :key="index" :label="item.name" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="上传时间">
-            <el-date-picker type="date" placeholder="选择日期" @change="searchQuestion"  size="small" v-model="form.createTime"
-                            style="width: 100%;"></el-date-picker>
+            <el-date-picker type="date" placeholder="选择日期" @change="searchQuestion" size="small" v-model="form.createTime" style="width: 100%;"></el-date-picker>
           </el-form-item>
           <el-form-item style="margin-left: 40px">
             <el-button size="small" type="primary" @click="searchQuestion">查询</el-button>
@@ -41,57 +31,31 @@
       <div class="content_body">
         <div class="tag_mark">
           <el-descriptions class="margin-top" :column="10" size="small">
-            <el-descriptions-item v-for="(item,index) in cateGroup" :key="index"  :label="item.name">{{ item.count }}</el-descriptions-item>
+            <el-descriptions-item v-for="(item,index) in cateGroup" :key="index" :label="item.name">{{ item.count }}</el-descriptions-item>
           </el-descriptions>
         </div>
-<!--        表格展示-->
+        <!--        表格展示-->
         <div class="table_body">
           <template>
-            <el-table
-                stripe
-                size="mini"
-                :header-cell-style="{ background: '#ecf5ff', color: '#606266' }"
-                :data="tableData"
-                border
-                style="width: 100%">
+            <el-table stripe size="mini" :header-cell-style="{ background: '#ecf5ff', color: '#606266' }" :data="tableData" border style="width: 100%">
               <el-table-column min-width="50" prop="id" label="ID" width="50">
               </el-table-column>
-              <el-table-column
-                  prop="categoryId"
-                  stripe="true"
-                  label="问题类别"
-                  width="100">
+              <el-table-column prop="categoryId" stripe="true" label="问题类别" width="100">
                 <template slot-scope="scope">
                   <el-tag size="mini" effect="dark" type="success">{{cateDict[scope.row.categoryId]}}</el-tag>
 
                 </template>
               </el-table-column>
-              <el-table-column
-                  prop="title"
-                  label="问题"
-                  width="280">
+              <el-table-column prop="title" label="问题" width="280">
               </el-table-column>
-              <el-table-column
-                  prop="content"
-                  label="解答">
+              <el-table-column prop="content" label="解答">
               </el-table-column>
-              <el-table-column
-                  prop="create_time"
-                  width="150"
-                  label="上传时间">
+              <el-table-column prop="create_time" width="150" label="上传时间">
               </el-table-column>
               <el-table-column fixed="right" width="280" label="操作" align="center">
                 <template slot-scope="scope">
-                  <el-button
-                      type="text"
-                      icon="el-icon-edit"
-                      size="mini"
-                      @click="openEdit(scope.row)">编辑内容</el-button>
-                  <el-button
-                      type="text"
-                      icon="el-icon-delete"
-                      size="mini"
-                      @click="openDelete(scope.row)">删除</el-button>
+                  <el-button type="text" icon="el-icon-edit" size="mini" @click="openEdit(scope.row)">编辑内容</el-button>
+                  <el-button type="text" icon="el-icon-delete" size="mini" @click="openDelete(scope.row)">删除</el-button>
                   <el-button type="text" v-if="scope.row.starTime" icon="el-icon-magic-stick" size="mini" @click="cancelStar(scope.row)">取消星标</el-button>
                   <el-button type="text" v-else icon="el-icon-magic-stick" size="mini" @click="openStar(scope.row)">设为星标(最近问答)</el-button>
                 </template>
@@ -102,24 +66,12 @@
       </div>
       <!--      底部分页器-->
       <div class="body_paging">
-        <el-pagination
-            background
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="curPage"
-            :page-sizes="[8, 15, 20, 30]"
-            :page-size="pageSize"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="total"
-        >
+        <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="curPage" :page-sizes="[8, 15, 20, 30]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
       </div>
     </el-card>
-<!--    批量上传问答抽屉-->
-    <el-drawer
-        :with-header="false"
-        :visible.sync="openDrawer"
-        :close-on-click-modal="false">
+    <!--    批量上传问答抽屉-->
+    <el-drawer :with-header="false" :visible.sync="openDrawer" :close-on-click-modal="false">
       <div class="drawer_top">
         <div class="top_title">批量问答 上传</div>
         <div class="top_mark">
@@ -129,61 +81,41 @@
       </div>
       <el-form class="form_item" :model="uploadForm" label-width="100px">
         <el-form-item label="上传EXCEL">
-          <el-upload
-              style="width: 100%;"
-              drag
-              :multiple="false"
-              :on-success="successUpload"
-              :headers="headers"
-              :action="uploadUrl"
-          >
+          <el-upload style="width: 100%;" drag :multiple="false" :on-success="successUpload" :headers="headers" :action="uploadUrl">
             <i class="el-icon-upload"></i>
             <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
             <div class="el-upload__tip" slot="tip">只能上传xlsx/xlsm/xls文件，文件不要超过200行</div>
           </el-upload>
         </el-form-item>
         <el-form-item v-show="canParse">
-          <el-button type="primary" @click="parseExcel">解  析</el-button>
+          <el-button type="primary" @click="parseExcel">解 析</el-button>
           <el-button @click="closeDrawer">取 消</el-button>
         </el-form-item>
       </el-form>
     </el-drawer>
 
-<!--    单个上传问答表单-->
-    <el-dialog
-        title="新增问答"
-        :visible.sync="openAddDrawer"
-        width="50%">
+    <!--    单个上传问答表单-->
+    <el-dialog title="新增问答" :visible.sync="openAddDrawer" width="50%">
       <el-form class="form_item" :rules="rules" :model="addQuestionForm" ref="addQuestionForm" label-width="100px">
         <el-form-item label="问答类别:" prop="questionType">
-          <el-select style="width:100%"  v-model="addQuestionForm.questionType" placeholder="请选择问答类别">
+          <el-select style="width:100%" v-model="addQuestionForm.questionType" placeholder="请选择问答类别">
             <el-option v-for="(item,index) in categories" :key="index" :label="item.name" :value="item.name"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="问题:" prop="questionTitle">
-          <el-input
-              type="textarea"
-              placeholder="请输入问题"
-              :autosize="{ minRows: 2, maxRows: 6}"
-              v-model="addQuestionForm.questionTitle"></el-input>
+          <el-input type="textarea" placeholder="请输入问题" :autosize="{ minRows: 2, maxRows: 6}" v-model="addQuestionForm.questionTitle"></el-input>
         </el-form-item>
         <el-form-item label="解答:" prop="questionAnswer">
-          <el-input type="textarea"
-                    placeholder="请输入解答"
-                    :autosize="{ minRows: 6, maxRows: 12}"
-                    v-model="addQuestionForm.questionAnswer"></el-input>
+          <el-input type="textarea" placeholder="请输入解答" :autosize="{ minRows: 6, maxRows: 12}" v-model="addQuestionForm.questionAnswer"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button size="small" type="primary" @click="addArticle">新  增</el-button>
-          <el-button size="small" @click="openAddDrawer=false" style="margin-left: 20px">取  消</el-button>
+          <el-button size="small" type="primary" @click="addArticle">新 增</el-button>
+          <el-button size="small" @click="openAddDrawer=false" style="margin-left: 20px">取 消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
 
-    <el-dialog
-        title="编辑内容"
-        :visible.sync="openUpdateDrawer"
-        width="50%">
+    <el-dialog title="编辑内容" :visible.sync="openUpdateDrawer" width="50%">
       <el-form class="form_item" :model="updateQuestionForm" label-width="100px">
         <el-form-item label="类别">
           <el-select style="width:100%" v-model="updateQuestionForm.questionType" placeholder="请选择问答类别" disabled>
@@ -191,30 +123,24 @@
           </el-select>
         </el-form-item>
         <el-form-item label="问题">
-          <el-input
-              type="textarea"
-              :autosize="{ minRows: 2, maxRows: 6}"
-              v-model="updateQuestionForm.questionTitle"></el-input>
+          <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6}" v-model="updateQuestionForm.questionTitle"></el-input>
         </el-form-item>
         <el-form-item label="解答">
-          <el-input type="textarea"
-                    :autosize="{ minRows: 6, maxRows: 12}"
-                    v-model="updateQuestionForm.questionAnswer"></el-input>
+          <el-input type="textarea" :autosize="{ minRows: 6, maxRows: 12}" v-model="updateQuestionForm.questionAnswer"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button size="small" type="primary" @click="updateArticleBtn">更  新</el-button>
-          <el-button size="small" @click="openUpdateDrawer=false" style="margin-left: 20px">取  消</el-button>
+          <el-button size="small" type="primary" @click="updateArticleBtn">更 新</el-button>
+          <el-button size="small" @click="openUpdateDrawer=false" style="margin-left: 20px">取 消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
-
 
   </div>
 </template>
 
 <script>
-import {host} from '@/config'
-import {checkExcelAPI} from "@/api/sj-kit/financeExcel";
+import { host } from '@/config'
+import { checkExcelAPI } from "@/api/sj-kit/financeExcel";
 import {
   addArticleAPI,
   updateArticleAPI,
@@ -236,7 +162,7 @@ export default {
       ossDownloadUrl: "https://51huoke.oss-cn-shenzhen.aliyuncs.com/sj-file-templates/%E9%97%AE%E7%AD%94%E6%A8%A1%E6%9D%BF.xlsx",
       curPage: 1,
       pageSize: 8,
-      titleTemplate:["分类名称","解答","问题"],
+      titleTemplate: ["分类名称", "解答", "问题"],
       total: 0,
       openDrawer: false,
       openAddDrawer: false,
@@ -245,27 +171,27 @@ export default {
       uploadUrl: host + "/cms/excel/upload",
       remoteFilePath: "resource/excel/20220811/1660205671770581000.xlsm",
       uploadForm: {
-        filePath:"",
-        fileName:"",
+        filePath: "",
+        fileName: "",
       },
-      cateGroup:[],
+      cateGroup: [],
       form: {
-        searchKey:"",
+        searchKey: "",
         searchType: "",
-        createTime:''
+        createTime: ''
       },
-      categories:[],
-      categorieNames:[],
-      cateDict:{},
+      categories: [],
+      categorieNames: [],
+      cateDict: {},
       addQuestionForm: {
         questionTitle: "",
         questionAnswer: "",
         questionType: "",
       },
-      rules:{
-        questionType:[{ required: true, message: '请选择问答类别', trigger: 'change'},],
-        questionTitle:[{ required: true, message: '请输入问题', trigger: 'blur'},],
-        questionAnswer:[{ required: true, message: '请输入回答', trigger: 'blur'},],
+      rules: {
+        questionType: [{ required: true, message: '请选择问答类别', trigger: 'change' },],
+        questionTitle: [{ required: true, message: '请输入问题', trigger: 'blur' },],
+        questionAnswer: [{ required: true, message: '请输入回答', trigger: 'blur' },],
       },
       updateQuestionForm: {
         id: null,
@@ -286,30 +212,30 @@ export default {
     }
   },
   created() {
-    this.getAllCategories()
+    // this.getAllCategories()
     // this.searchQuestion()
-    this.getGroupCate()
+    // this.getGroupCate()
   },
   methods: {
     /** 获取文章分类统计信息 */
-    getGroupCate (){
-      getArticlesCountAPI().then(res =>{
+    getGroupCate() {
+      getArticlesCountAPI().then(res => {
         this.cateGroup = res
-      }).catch(e =>{
+      }).catch(e => {
         this.$message.error(e.message)
       })
     },
     /** 取消星标 */
-    cancelStar(data){
+    cancelStar(data) {
       this.$confirm('是否将文章取消星标?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        let params={
+        let params = {
           id: data.id
         }
-        cancelStar(params).then(res=>{
+        cancelStar(params).then(res => {
           this.$message({
             type: 'success',
             message: "操作成功！"
@@ -324,16 +250,16 @@ export default {
       });
     },
     /** 将文章设置星标 */
-    openStar (data){
+    openStar(data) {
       this.$confirm('是否将文章设置为最近问答?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        let params={
+        let params = {
           id: data.id
         }
-        starArticle(params).then(res=>{
+        starArticle(params).then(res => {
           this.$message({
             type: 'success',
             message: "操作成功！"
@@ -349,7 +275,7 @@ export default {
 
     },
     /** 编辑内容 */
-    openEdit (item){
+    openEdit(item) {
       this.updateQuestionForm.id = item.id
       this.updateQuestionForm.questionType = this.cateDict[item.categoryId]
       this.updateQuestionForm.questionTitle = item.title
@@ -357,23 +283,23 @@ export default {
       this.openUpdateDrawer = true
     },
     /** 更新文章*/
-    updateArticleBtn(){
-      updateArticleAPI(this.updateQuestionForm).then(res =>{
+    updateArticleBtn() {
+      updateArticleAPI(this.updateQuestionForm).then(res => {
         this.$message.success("问答更新成功！")
         this.searchQuestion()
         this.openUpdateDrawer = false
-      }).catch(e=>{
+      }).catch(e => {
         this.$message.error(e.message)
       })
     },
     /** 删除文章 */
-    openDelete(data){
+    openDelete(data) {
       this.$confirm('此操作将永久删除问答, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        let params={
+        let params = {
           id: data.id
         }
         deleteArticle(params).then(res => {
@@ -393,10 +319,10 @@ export default {
       });
     },
     /**  获取所有分类列表 */
-    getAllCategories (){
-      getCateListAPI().then(res =>{
+    getAllCategories() {
+      getCateListAPI().then(res => {
         this.categories = res.list
-        for (let item of res.list){
+        for (let item of res.list) {
           this.cateDict[item.id] = item.name
           this.categorieNames.push(item.name)
         }
@@ -404,7 +330,7 @@ export default {
       this.searchQuestion()
     },
     // 上传文件的钩子函数
-    successUpload (res, file){
+    successUpload(res, file) {
       if (res.success) {
         this.uploadForm.filePath = res.data.file_path
         this.uploadForm.fileName = res.data.file_name
@@ -415,18 +341,18 @@ export default {
         return this.$message.success(res.msg)
       }
     },
-    parseExcel (){
+    parseExcel() {
       let params = {
         file_path: this.uploadForm.filePath,
         file_name: this.uploadForm.fileName,
       }
-      parseExcel(params).then(res =>{
-        this.$message.success("导入成功:"+res.SuccessNum +"条，失败："+res.Failed+"条")
-      }).catch(e =>{
+      parseExcel(params).then(res => {
+        this.$message.success("导入成功:" + res.SuccessNum + "条，失败：" + res.Failed + "条")
+      }).catch(e => {
         this.$message.error(e.msg)
       })
     },
-    closeDrawer(){
+    closeDrawer() {
       this.openDrawer = false
     },
 
@@ -444,7 +370,7 @@ export default {
 
     },
     /** 搜索问答列表 */
-    searchQuestion () {
+    searchQuestion() {
       let params = {
         searchKey: this.form.searchKey,
         searchType: this.form.searchType,
@@ -452,23 +378,23 @@ export default {
         pageNum: this.curPage,
         pageSize: this.pageSize
       }
-      getArticlesAPI(params).then(res =>{
+      getArticlesAPI(params).then(res => {
         this.tableData = res.list
         this.total = res.total
       })
     },
     /** 点击添加问答 */
-    addArticle () {
+    addArticle() {
       this.$refs['addQuestionForm'].validate((valid) => {
         if (valid) {
-          addArticleAPI(this.addQuestionForm).then(res=>{
+          addArticleAPI(this.addQuestionForm).then(res => {
             this.openAddDrawer = false
             this.searchQuestion()
             this.$message.success("创建问答成功！")
             this.addQuestionForm.questionAnswer = ""
             this.addQuestionForm.questionTitle = ""
             this.addQuestionForm.questionType = ""
-          }).catch(e=>{
+          }).catch(e => {
             this.$message.error(e.message)
           })
         } else {
@@ -530,7 +456,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.el-card.is-always-shadow, .el-card.is-hover-shadow:focus, .el-card.is-hover-shadow:hover {
+.el-card.is-always-shadow,
+.el-card.is-hover-shadow:focus,
+.el-card.is-hover-shadow:hover {
   box-shadow: none;
 }
 
@@ -544,7 +472,7 @@ export default {
 }
 
 ::v-deep .el-drawer__body {
-  background: #F5F5F5 !important;
+  background: #f5f5f5 !important;
 }
 
 .drawer_top {

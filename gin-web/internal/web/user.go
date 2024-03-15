@@ -6,7 +6,6 @@ import (
 	"gin-web/internal/service"
 	"github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 )
 
@@ -118,26 +117,31 @@ func (h *UserHandler) PwdLogin(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "数据不合法")
 		return
 	}
-	domainU, err := h.userSvc.Login(c, pwdForm.UserName, pwdForm.Password)
+	//domainU, err := h.userSvc.Login(c, pwdForm.UserName, pwdForm.Password)
+	_, err := h.userSvc.Login(c, pwdForm.UserName, pwdForm.Password)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"msg": err.Error()})
 		return
 	}
 	// 登录成功后 生成一个JWT
 
-	claims := domain.UserClaims{
-		RegisteredClaims: jwt.RegisteredClaims{},
-		UserId:           int64(domainU.Id),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodES512, claims)
-	tokenStr, err := token.SignedString([]byte("wulinlin"))
-	if err != nil {
-		c.String(http.StatusInternalServerError, "系统错误")
-		return
-	}
-	c.Header("x-jwt-token", tokenStr)
-	fmt.Println(tokenStr, "哈哈")
-	c.JSON(http.StatusOK, gin.H{"msg": "登录成功！"})
+	//claims := domain.UserClaims{
+	//	RegisteredClaims: jwt.RegisteredClaims{},
+	//	UserId:           int64(domainU.Id),
+	//}
+	//token := jwt.NewWithClaims(jwt.SigningMethodES512, claims)
+	//tokenStr, err := token.SignedString([]byte("wulinlin"))
+	//if err != nil {
+	//	c.String(http.StatusInternalServerError, "系统错误")
+	//	return
+	//}
+	//c.Header("x-jwt-token", tokenStr)
+	//fmt.Println(tokenStr, "哈哈")
+	c.JSON(http.StatusOK, Result{
+		Data: map[string]string{
+			"token": "1231",
+		},
+	})
 	return
 }
 

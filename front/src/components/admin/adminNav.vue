@@ -1,16 +1,7 @@
 <template>
   <el-aside class="nav" width="initial">
     <!--    侧边栏菜单展示 通过动态形式-->
-    <el-menu
-      default-active="2"
-      router
-      class="el-menu-vertical-demo"
-      @open="handleOpen"
-      @close="handleClose"
-      background-color="#191a23"
-      text-color="#fff"
-      active-text-color="#4D70FF"
-    >
+    <el-menu default-active="2" router class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" background-color="#191a23" text-color="#fff" active-text-color="#4D70FF">
       <div class="logo-aside" @click="clickTitle">
         <img src="@/assets/logo.png" alt="" class="logo" />
         <p class="title">路打先锋</p>
@@ -19,7 +10,7 @@
       <el-menu-item index="/ldxf-cms/question-manager">
         <template slot="title">
           <i class="el-icon-notebook-1"></i>
-          <span>问答上传</span>
+          <span>企业信息</span>
         </template>
       </el-menu-item>
       <el-menu-item index="/ldxf-cms/user-manager">

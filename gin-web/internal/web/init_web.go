@@ -13,9 +13,10 @@ func RegisterRouters(engine *gin.Engine, u *UserHandler, c *CaptchaHandler) *gin
 	engine.POST("/api/v1/users/login-jwt", u.PwdLogin) // 用户登录
 	//engine.GET("/users/profile", u.Profile)                 // 上传头像
 	//engine.POST("/users/edit", u.Edit)                      // 编辑信息
-	engine.POST("/api/v1/login-sms/code/send", u.SMSSender) // 编辑信息
-	engine.POST("/api/v1/login-sms", u.PhoneLogin)          // 编辑信息
-	engine.GET("/api/v1/captcha", c.CaptchaImgAPI)          // 编辑信息
+	engine.POST("/api/v1/login-sms/code/send", u.SMSSender)       // 编辑信息
+	engine.POST("/api/v1/login-sms", u.PhoneLogin)                // 编辑信息
+	engine.GET("/api/v1/captcha", c.CaptchaImgAPI)                // 编辑信息
+	engine.POST("/api/v1/cms/excel/upload", UploadFileController) // 文件上传
 
 	return engine
 }
