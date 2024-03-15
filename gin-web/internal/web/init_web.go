@@ -9,7 +9,7 @@ import "github.com/gin-gonic/gin"
 func RegisterRouters(engine *gin.Engine, u *UserHandler, c *CaptchaHandler) *gin.Engine {
 	//u := &UserHandler{}  这个已经不能用啦              // 改成这个
 	engine.POST("/api/v1/users/signup", u.SignUp)      // 用户注册
-	engine.POST("/api/v1/users/login", u.PwdLogin)     // 用户登录
+	engine.POST("/api/v1/users/pwd-login", u.PwdLogin) // 用户登录
 	engine.POST("/api/v1/users/login-jwt", u.PwdLogin) // 用户登录
 	//engine.GET("/users/profile", u.Profile)                 // 上传头像
 	//engine.POST("/users/edit", u.Edit)                      // 编辑信息

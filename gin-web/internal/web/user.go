@@ -52,8 +52,8 @@ func NewUserHandler(svc service.IUserService, codeSvc service.ICodeService) *Use
 //	@param c
 func (h *UserHandler) SignUp(c *gin.Context) {
 	type SignUpForm struct {
-		Email           string `json:"email"`
-		ConfirmPassword string `json:"confirmPassword"`
+		UserName        string `json:"username"`
+		ConfirmPassword string `json:"rpassword"`
 		Password        string `json:"password"`
 	}
 	var signForm SignUpForm
@@ -67,34 +67,33 @@ func (h *UserHandler) SignUp(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"msg": "两次密码输入不一致！"})
 		return
 	}
-	ok, err := h.emailCompile.MatchString(signForm.Email)
-	if err != nil {
-		// 正则匹配失败会返回Error
-		c.JSON(http.StatusOK, gin.H{"msg": "系统内部错误！"})
-		return
-	}
-	if !ok {
-		c.JSON(http.StatusOK, gin.H{"msg": "邮箱格式不合法！"})
-		return
-	}
+	//ok, err := h.emailCompile.MatchString(signForm.UserName)
+	//if err != nil {
+	//	// 正则匹配失败会返回Error
+	//	c.JSON(http.StatusOK, gin.H{"msg": "系统内部错误！"})
+	//	return
+	//}
+	//if !ok {
+	//	c.JSON(http.StatusOK, gin.H{"msg": "邮箱格式不合法！"})
+	//	return
+	//}
 
-	//校验密码是否合法
-	ok, err = h.pwdCompile.MatchString(signForm.Password)
-	if err != nil {
-		// 正则匹配失败会返回Error
-		c.JSON(http.StatusOK, gin.H{"msg": "系统内部错误！"})
-		return
-	}
-	if !ok {
-		c.JSON(http.StatusOK, gin.H{"msg": "密码必须包含字母，数字或者特殊字符的任意两种，且长度不能低于6位！"})
-		return
-	}
-	err = h.userSvc.Signup(c, domain.DMUser{
-		Email: signForm.Email,
-		Pwd:   signForm.Password,
+	////校验密码是否合法
+	//ok, err := h.pwdCompile.MatchString(signForm.Password)
+	//if err != nil {
+	//	// 正则匹配失败会返回Error
+	//	c.JSON(http.StatusOK, gin.H{"msg": "系统内部错误！"})
+	//	return
+	//}
+	//if !ok {
+	//	c.JSON(http.StatusOK, gin.H{"msg": "密码必须包含字母，数字或者特殊字符的任意两种，且长度不能低于6位！"})
+	//	return
+	//}
+	err := h.userSvc.Signup(c, domain.DMUser{
+		Username: signForm.UserName,
+		Pwd:      signForm.Password,
 	})
 	if err != nil {
-
 		return
 	}
 	//响应前端 注册用户成功
@@ -109,17 +108,19 @@ func (h *UserHandler) SignUp(c *gin.Context) {
 //	@param c
 func (h *UserHandler) PwdLogin(c *gin.Context) {
 	type PwdLoginReq struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		UserName    string `json:"username"`
+		Password    string `json:"password"`
+		CaptchaId   string `json:"captcha_id"`
+		CaptchaCode string `json:"captcha_code"`
 	}
 	var pwdForm PwdLoginReq
 	if err := c.Bind(&pwdForm); err != nil {
 		c.String(http.StatusUnauthorized, "数据不合法")
 		return
 	}
-	domainU, err := h.userSvc.Login(c, pwdForm.Email, pwdForm.Password)
+	domainU, err := h.userSvc.Login(c, pwdForm.UserName, pwdForm.Password)
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"msg": "系统内部错误"})
+		c.JSON(http.StatusOK, gin.H{"msg": err.Error()})
 		return
 	}
 	// 登录成功后 生成一个JWT

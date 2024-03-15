@@ -8,7 +8,6 @@ import "github.com/golang-jwt/jwt/v5"
 
 type DMUser struct {
 	Id       uint
-	Email    string
 	Pwd      string
 	Username string
 	Phone    string
