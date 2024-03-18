@@ -11,10 +11,10 @@ import (
 // @Author 代码小学生王木木
 // @Date 2024-02-27 14:57
 
-func InitGin(hdl *web.UserHandler, c *web.CaptchaHandler, mdls []gin.HandlerFunc) *gin.Engine {
+func InitGin(hdl *web.UserHandler, c *web.CaptchaHandler, e *web.ExcelHandler, mdls []gin.HandlerFunc) *gin.Engine {
 	server := gin.Default()
 	server.Use(mdls...)
-	web.RegisterRouters(server, hdl, c)
+	web.RegisterRouters(server, hdl, c, e)
 	return server
 }
 

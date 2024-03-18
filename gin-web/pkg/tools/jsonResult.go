@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SUCCESS          = 200
+	SUCCESS          = 0
 	ERROR            = 500
 	BAD_INPUT_PARAMS = 400
 	NOT_LOGIN        = 1001

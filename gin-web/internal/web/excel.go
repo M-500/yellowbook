@@ -1,6 +1,8 @@
 package web
 
 import (
+	"gin-web/internal/service"
+	"gin-web/pkg/tools"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -10,9 +12,16 @@ import (
 // @Date 2024-03-15 18:06
 
 type ExcelHandler struct {
+	svc *service.ExcelParserService
 }
 
-func (h *ExcelHandler) ParseExcel(c gin.Context) {
+func NewExcelHandler(s *service.ExcelParserService) *ExcelHandler {
+	return &ExcelHandler{
+		svc: s,
+	}
+}
+
+func (h *ExcelHandler) ParseExcel(c *gin.Context) {
 	type Req struct {
 		FileName string `json:"file_name"`
 		FilePath string `json:"file_path"`
@@ -24,9 +33,10 @@ func (h *ExcelHandler) ParseExcel(c gin.Context) {
 		return
 	}
 	// 校验路径是否合法
-
-	// 解析Excel
-
-	// 返回值
-
+	err := h.svc.ParserExcel(form.FilePath)
+	if err != nil {
+		tools.JsonErrorStrResp(c, err.Error())
+		return
+	}
+	tools.JsonSuccessData(c, "解析成功", nil)
 }
