@@ -4,6 +4,7 @@ import (
 	"gin-web/internal/repository/dao"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/plugin/prometheus"
 )
 
 // @Description
@@ -17,6 +18,19 @@ func InitDB() *gorm.DB {
 	}
 	// 初始化数据库
 	err = dao.InitTable(db)
+	if err != nil {
+		panic(err)
+	}
+	err = db.Use(prometheus.New(prometheus.Config{
+		DBName:          "",
+		RefreshInterval: 15,    // 插件采集数据的评率
+		StartServer:     false, // 因为已经启动过了。所以要设置为false
+		MetricsCollector: []prometheus.MetricsCollector{
+			&prometheus.MySQL{
+				VariableNames: []string{"thread_runing"},
+			},
+		},
+	}))
 	if err != nil {
 		panic(err)
 	}

@@ -3,6 +3,7 @@ package ioc
 import (
 	"gin-web/internal/web"
 	"gin-web/internal/web/middleware"
+	"gin-web/pkg/ginx/middleware/metric"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 )
@@ -27,6 +28,13 @@ func InitMiddlewares(redisClient redis.Cmdable) []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		//ratelimit.NewBuilder(redisClient, time.Minute, 3).Build(), // 限流组件
 		middleware.CorsMiddleware(), // 跨域中间件
+		(&metric.MiddlewareBuilder{
+			NameSpace:  "test_gin_web",
+			Name:       "gin_http",
+			SubSystem:  "damn1",
+			Help:       "统计gin_web的HTTP接口",
+			InstanceId: "my_instance_id",
+		}).Build(),
 		//middleware.NewLoginMiddlewareBuilder().
 		//	IgnorePath("/user/login").
 		//	IgnorePath("/login-sms/code/send").

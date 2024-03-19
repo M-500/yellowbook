@@ -12,10 +12,10 @@ import (
 // @Date 2024-03-15 18:06
 
 type ExcelHandler struct {
-	svc *service.ExcelParserService
+	svc service.IExcelParseService
 }
 
-func NewExcelHandler(s *service.ExcelParserService) *ExcelHandler {
+func NewExcelHandler(s service.IExcelParseService) *ExcelHandler {
 	return &ExcelHandler{
 		svc: s,
 	}
@@ -33,7 +33,7 @@ func (h *ExcelHandler) ParseExcel(c *gin.Context) {
 		return
 	}
 	// 校验路径是否合法
-	err := h.svc.ParserExcel(form.FilePath)
+	err := h.svc.ParserExcel(c, form.FilePath)
 	if err != nil {
 		tools.JsonErrorStrResp(c, err.Error())
 		return

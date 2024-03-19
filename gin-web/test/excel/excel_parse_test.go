@@ -39,10 +39,18 @@ func TestExcelParse(t *testing.T) {
 			}
 		}
 
-		//for _, cell := range row {
-		//	fmt.Printf("%s\n", cell)
-		//}
 		if i > 1 {
+
+			//break
+			for _, cell := range row {
+
+				val, ok := titleMap["企业名称"]
+				fmt.Println("gan", val, cell)
+				if !ok {
+
+				}
+				fmt.Printf("%s\n", row[val])
+			}
 			break
 		}
 		fmt.Println(titleMap)
