@@ -9,6 +9,7 @@ import (
 	"github.com/xuri/excelize/v2"
 	"log"
 	"os"
+	"sync"
 )
 
 // @Description
@@ -154,6 +155,7 @@ func (e *ExcelParserService) ParserExcelV1(ctx context.Context, path string) err
 	}
 	fmt.Println(len(rows))
 	titleMap := make(map[string]int, 20)
+	var wg sync.WaitGroup
 	for i, row := range rows {
 		if i == 0 {
 			continue
@@ -165,7 +167,9 @@ func (e *ExcelParserService) ParserExcelV1(ctx context.Context, path string) err
 			}
 			continue
 		}
+		wg.Add(1)
 		go func() {
+			defer wg.Done()
 			company := domain.Company{}
 			val, ok := titleMap["企业名称"]
 			if ok {
@@ -223,6 +227,7 @@ func (e *ExcelParserService) ParserExcelV1(ctx context.Context, path string) err
 			}
 		}()
 	}
+	wg.Wait()
 	// 异步处理，批量提交
 	return nil
 }
