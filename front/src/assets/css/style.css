@@ -1,0 +1,15 @@
+html,body,#app{
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+.el-card{
+    margin: 8px;
+    background-color: #ffffff;
+}
+
+
+/*.el-button.el-button--primary{*/
+/*    background:#4D70FF !important;*/
+/*    border: #4D70FF;*/
+/*}*/

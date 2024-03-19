@@ -50,9 +50,9 @@ func (u2 *UserService) FindOrCreate(ctx context.Context, phone string) (domain.D
 	panic("implement me")
 }
 
-func (u2 *UserService) Login(ctx context.Context, email, password string) (domain.DMUser, error) {
+func (u2 *UserService) Login(ctx context.Context, phone, password string) (domain.DMUser, error) {
 	// 查找用户
-	u, err := u2.userRepo.FindByEmail(ctx, email)
+	u, err := u2.userRepo.FindByUserName(ctx, phone)
 	if err != nil {
 		return domain.DMUser{}, errors.New("用户不存在")
 	}

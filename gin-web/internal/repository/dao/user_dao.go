@@ -21,6 +21,7 @@ type IUserDao interface {
 	Insert(ctx context.Context, u UserModel) error
 	UpdateNonZeroFields(ctx context.Context, u UserModel) error
 	FindByPhone(ctx context.Context, phone string) (UserModel, error)
+	FindByUsername(ctx context.Context, username string) (UserModel, error)
 	FindByEmail(ctx context.Context, email string) (UserModel, error)
 	FindByWechat(ctx context.Context, openId string) (UserModel, error)
 	FindById(ctx context.Context, id int64) (UserModel, error)
@@ -54,6 +55,11 @@ func (u2 *UserDAO) UpdateNonZeroFields(ctx context.Context, u UserModel) error {
 func (u2 *UserDAO) FindByPhone(ctx context.Context, phone string) (UserModel, error) {
 	userModel := UserModel{}
 	err := u2.db.WithContext(ctx).Where("`phone` = ?", phone).First(&userModel).Error
+	return userModel, err
+}
+func (u2 *UserDAO) FindByUsername(ctx context.Context, username string) (UserModel, error) {
+	userModel := UserModel{}
+	err := u2.db.WithContext(ctx).Where("`user_name` = ?", username).First(&userModel).Error
 	return userModel, err
 }
 

@@ -24,14 +24,20 @@ func InitWebServer() *gin.Engine {
 
 		cache.NewCodeCache,
 		dao.NewUserDAO,
+		dao.NewEnterpriseDao,
 
 		repository.NewUserRepository,
 		repository.NewCodeRepository,
+		repository.NewCompanyRepo,
 
 		service.NewCodeService,
 		service.NewUserService,
+		service.NewCaptchaService,
+		service.NewExcelParserService,
 
 		web.NewUserHandler,
+		web.NewCaptchaHandler,
+		web.NewExcelHandler,
 
 		// 你中间件呢？注册路由呢
 		ioc.InitGin,

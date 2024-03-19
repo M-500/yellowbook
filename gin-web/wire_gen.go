@@ -29,7 +29,13 @@ func InitWebServer() *gin.Engine {
 	iCodeRepo := repository.NewCodeRepository(iCodeCache)
 	iCodeService := service.NewCodeService(ismsService, iCodeRepo)
 	userHandler := web.NewUserHandler(iUserService, iCodeService)
+	iCaptcha := service.NewCaptchaService()
+	captchaHandler := web.NewCaptchaHandler(iCaptcha)
+	iEnterpriseDao := dao.NewEnterpriseDao(db)
+	iCompany := repository.NewCompanyRepo(iEnterpriseDao)
+	iExcelParseService := service.NewExcelParserService(iCompany)
+	excelHandler := web.NewExcelHandler(iExcelParseService)
 	v := ioc.InitMiddlewares(cmdable)
-	engine := ioc.InitGin(userHandler, v)
+	engine := ioc.InitGin(userHandler, captchaHandler, excelHandler, v)
 	return engine
 }
