@@ -40,3 +40,23 @@ func (h *ExcelHandler) ParseExcel(c *gin.Context) {
 	}
 	tools.JsonSuccessData(c, "解析成功", nil)
 }
+
+func (h *ExcelHandler) ParseExcelV1(c *gin.Context) {
+	type Req struct {
+		FileName string `json:"file_name"`
+		FilePath string `json:"file_path"`
+	}
+	// 校验参数
+	var form Req
+	if err := c.Bind(&form); err != nil {
+		c.String(http.StatusUnauthorized, "数据不合法")
+		return
+	}
+	// 校验路径是否合法
+	err := h.svc.ParserExcelV1(c, form.FilePath)
+	if err != nil {
+		tools.JsonErrorStrResp(c, err.Error())
+		return
+	}
+	tools.JsonSuccessData(c, "解析成功", nil)
+}

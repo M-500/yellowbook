@@ -18,6 +18,7 @@ func RegisterRouters(engine *gin.Engine, u *UserHandler, c *CaptchaHandler, e *E
 	engine.GET("/api/v1/captcha", c.CaptchaImgAPI)                // 编辑信息
 	engine.POST("/api/v1/cms/excel/upload", UploadFileController) // 文件上传
 	engine.POST("/api/v1/cms/excel-check", e.ParseExcel)          // 解析Excel文件
+	engine.POST("/api/v1/cms/excel-check-v1", e.ParseExcelV1)     // 解析Excel文件
 
 	return engine
 }
