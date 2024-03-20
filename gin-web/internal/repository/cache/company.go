@@ -13,20 +13,27 @@ import (
 
 type CompanyCache interface {
 	Add(ctx context.Context, key string, val any) error
-	Exist(ctx context.Context, key string) (bool, error)
+	Exist(ctx context.Context, key string, val any) (bool, error)
 }
 
 type RedisCompanyCache struct {
 	redis redis.Cmdable
 }
 
-func (r *RedisCompanyCache) Add(ctx context.Context, key string, val any) error {
-	//TODO implement me
-	panic("implement me")
+func NewRedisCompanyCache(redis redis.Cmdable) CompanyCache {
+	return &RedisCompanyCache{
+		redis: redis,
+	}
 }
 
-func (r *RedisCompanyCache) Exist(ctx context.Context, key string) (bool, error) {
+func (r *RedisCompanyCache) Add(ctx context.Context, key string, val any) error {
+	return r.redis.SAdd(ctx, key, val).Err()
+}
 
-	//TODO implement me
-	panic("implement me")
+func (r *RedisCompanyCache) Exist(ctx context.Context, key string, val any) (bool, error) {
+	//result, err := r.redis.SIsMember(ctx, key,val).Result()
+	//if err != nil {
+	//	return false, err
+	//}
+	return r.redis.SIsMember(ctx, key, val).Result()
 }

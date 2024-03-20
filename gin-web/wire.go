@@ -23,6 +23,7 @@ func InitWebServer() *gin.Engine {
 		ioc.InitRedis,
 
 		cache.NewCodeCache,
+		cache.NewRedisCompanyCache,
 		dao.NewUserDAO,
 		dao.NewEnterpriseDao,
 

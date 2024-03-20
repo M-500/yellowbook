@@ -31,6 +31,55 @@ func NewExcelParserService(repo repository.ICompany) IExcelParseService {
 	}
 }
 
+func (e *ExcelParserService) parser(titleMap map[string]int, row []string) domain.Company {
+	company := domain.Company{}
+	val, ok := titleMap["企业名称"]
+	if ok {
+		company.EnterpriseName = row[val]
+	}
+	val, ok = titleMap["登记状态"]
+	if ok {
+		company.RegistrationStatus = row[val]
+	}
+	val, ok = titleMap["法定代表人"]
+	if ok {
+		company.LegalRepresentative = row[val]
+	}
+	val, ok = titleMap["注册资本"]
+	if ok {
+		company.RegisteredCapital = row[val]
+	}
+	//val, ok = titleMap["成立日期"]
+	//if ok {
+	//	company.EstablishmentDate = row[val]
+	//}
+	val, ok = titleMap["统一社会信用代码"]
+	if ok {
+		company.UnifiedSocialCreditCode = row[val]
+	}
+	val, ok = titleMap["企业注册地址"]
+	if ok {
+		company.EnterpriseRegistrationAddress = row[val]
+	}
+	val, ok = titleMap["电话"]
+	if ok {
+		company.Phone = row[val]
+	}
+	val, ok = titleMap["更多电话"]
+	if ok {
+		company.MorePhone = row[val]
+	}
+	val, ok = titleMap["邮箱"]
+	if ok {
+		company.Email = row[val]
+	}
+	val, ok = titleMap["更多邮箱"]
+	if ok {
+		company.MoreEmail = row[val]
+	}
+	return company
+}
+
 func (e *ExcelParserService) ParserExcel(ctx context.Context, path string) error {
 	// 校验文件是否存在
 	_, err := os.Stat(path)
@@ -69,59 +118,10 @@ func (e *ExcelParserService) ParserExcel(ctx context.Context, path string) error
 			}
 			continue
 		}
-		company := domain.Company{}
-		val, ok := titleMap["企业名称"]
-		if ok {
-			company.EnterpriseName = row[val]
-		}
-		val, ok = titleMap["登记状态"]
-		if ok {
-			company.RegistrationStatus = row[val]
-		}
-		val, ok = titleMap["法定代表人"]
-		if ok {
-			company.LegalRepresentative = row[val]
-		}
-		val, ok = titleMap["注册资本"]
-		if ok {
-			company.RegisteredCapital = row[val]
-		}
-		//val, ok = titleMap["成立日期"]
-		//if ok {
-		//	company.EstablishmentDate = row[val]
-		//}
-		val, ok = titleMap["统一社会信用代码"]
-		if ok {
-			company.UnifiedSocialCreditCode = row[val]
-		}
-		val, ok = titleMap["企业注册地址"]
-		if ok {
-			company.EnterpriseRegistrationAddress = row[val]
-		}
-		val, ok = titleMap["电话"]
-		if ok {
-			company.Phone = row[val]
-		}
-		val, ok = titleMap["更多电话"]
-		if ok {
-			company.MorePhone = row[val]
-		}
-		val, ok = titleMap["邮箱"]
-		if ok {
-			company.Email = row[val]
-		}
-		val, ok = titleMap["更多邮箱"]
-		if ok {
-			company.MoreEmail = row[val]
-		}
-		//if i > 2 {
-		//	break
-		//}
-		//fmt.Println(titleMap)
-		//fmt.Println("解析结果", company)
+		company := e.parser(titleMap, row)
 		err = e.repo.Create(ctx, company)
 		if err != nil {
-			return err
+			//return err
 		}
 	}
 	// 异步处理，批量提交
