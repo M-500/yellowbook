@@ -56,35 +56,46 @@ func InitDB() *gorm.DB {
 		//	0.999: 0.0001,
 		//},
 	}, []string{"type", "table"})
-
+	pcb := &Callbacks{
+		vector: vector,
+	}
 	// 监控查询的执行时间
-	err = db.Callback().Create().Before("*").Register("prometheus_create_before", func(db *gorm.DB) {
-		startTime := time.Now()
-		db.Set("start_time", startTime)
-	}) // 作用于Insert语句
+	err = db.Callback().Create().Before("*").Register("prometheus_create_before", pcb.before()) // 作用于Insert语句
 	if err != nil {
 		panic(err)
 	}
 	// 监控查询的执行时间
-	err = db.Callback().Create().After("*").Register("prometheus_create_before", func(db *gorm.DB) {
-		val, _ := db.Get("start_time")
-		startTime, ok := val.(time.Time)
-		if !ok {
-			return
-		}
-		// 上报普罗米修斯
-		table := db.Statement.Table
-		if len(table) == 0 {
-			table = "unknown" // 调用 原生SQL的时候 就没有table ROW查询页没有
-		}
-		vector.WithLabelValues("create", table).Observe(time.Since(startTime).Seconds())
+	err = db.Callback().Create().After("*").Register("prometheus_create_before", pcb.after("create")) // 作用于Insert语句
 
-	}) // 作用于Insert语句
+	// 监控查询的执行时间
+	err = db.Callback().Update().Before("*").Register("prometheus_create_before", pcb.before()) // 作用于Insert语句
+	if err != nil {
+		panic(err)
+	}
+	// 监控查询的执行时间
+	err = db.Callback().Update().After("*").Register("prometheus_create_before", pcb.after("update")) // 作用于Insert语句
+
+	// 监控查询的执行时间
+	err = db.Callback().Delete().Before("*").Register("prometheus_create_before", pcb.before()) // 作用于Insert语句
+	if err != nil {
+		panic(err)
+	}
+	// 监控查询的执行时间
+	err = db.Callback().Delete().After("*").Register("prometheus_create_before", pcb.after("delete")) // 作用于Insert语句
+
+	// 监控查询的执行时间
+	err = db.Callback().Query().Before("*").Register("prometheus_create_before", pcb.before()) // 作用于Insert语句
+	if err != nil {
+		panic(err)
+	}
+	// 监控查询的执行时间
+	err = db.Callback().Query().After("*").Register("prometheus_create_before", pcb.after("query")) // 作用于Insert语句
+
 	return db
 }
 
 type Callbacks struct {
-	vector prometheus2.SummaryVec
+	vector *prometheus2.SummaryVec
 }
 
 func (c *Callbacks) before() func(db *gorm.DB) {
