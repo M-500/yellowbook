@@ -12,5 +12,6 @@ func InitRedis() redis.Cmdable {
 		Addr: "192.168.1.52:6379",
 		DB:   8,
 	})
+
 	return redisClient
 }
