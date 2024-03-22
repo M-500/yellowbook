@@ -2,7 +2,7 @@ package ioc
 
 import (
 	"gin-web/internal/repository/dao"
-	prometheus2 "github.com/prometheus/client_golang/prometheus"
+	promsdk "github.com/prometheus/client_golang/prometheus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/plugin/prometheus"
@@ -44,58 +44,32 @@ func InitDB() *gorm.DB {
 		panic(err)
 	}
 
-	vector := prometheus2.NewSummaryVec(prometheus2.SummaryOpts{
+	vector := promsdk.NewSummaryVec(promsdk.SummaryOpts{
 		Namespace: "test_gin_web",
 		Name:      "gorm_query_time",
 		Subsystem: "damn1",
 		Help:      "统计Gorm的查询时间",
-		//Objectives: map[float64]float64{
-		//	0.5:   0.01,
-		//	0.9:   0.01,
-		//	0.99:  0.001,
-		//	0.999: 0.0001,
-		//},
+		ConstLabels: map[string]string{
+			"db": "xhs",
+		},
+		Objectives: map[float64]float64{
+			0.5:   0.01,
+			0.9:   0.01,
+			0.99:  0.001,
+			0.999: 0.0001,
+		},
 	}, []string{"type", "table"})
+
+	promsdk.MustRegister(vector)
 	pcb := &Callbacks{
 		vector: vector,
 	}
-	// 监控查询的执行时间
-	err = db.Callback().Create().Before("*").Register("prometheus_create_before", pcb.before()) // 作用于Insert语句
-	if err != nil {
-		panic(err)
-	}
-	// 监控查询的执行时间
-	err = db.Callback().Create().After("*").Register("prometheus_create_before", pcb.after("create")) // 作用于Insert语句
-
-	// 监控查询的执行时间
-	err = db.Callback().Update().Before("*").Register("prometheus_create_before", pcb.before()) // 作用于Insert语句
-	if err != nil {
-		panic(err)
-	}
-	// 监控查询的执行时间
-	err = db.Callback().Update().After("*").Register("prometheus_create_before", pcb.after("update")) // 作用于Insert语句
-
-	// 监控查询的执行时间
-	err = db.Callback().Delete().Before("*").Register("prometheus_create_before", pcb.before()) // 作用于Insert语句
-	if err != nil {
-		panic(err)
-	}
-	// 监控查询的执行时间
-	err = db.Callback().Delete().After("*").Register("prometheus_create_before", pcb.after("delete")) // 作用于Insert语句
-
-	// 监控查询的执行时间
-	err = db.Callback().Query().Before("*").Register("prometheus_create_before", pcb.before()) // 作用于Insert语句
-	if err != nil {
-		panic(err)
-	}
-	// 监控查询的执行时间
-	err = db.Callback().Query().After("*").Register("prometheus_create_before", pcb.after("query")) // 作用于Insert语句
-
+	pcb.registerAll(db)
 	return db
 }
 
 type Callbacks struct {
-	vector *prometheus2.SummaryVec
+	vector *promsdk.SummaryVec
 }
 
 func (c *Callbacks) before() func(db *gorm.DB) {
@@ -118,4 +92,54 @@ func (c *Callbacks) after(typ string) func(db *gorm.DB) {
 		}
 		c.vector.WithLabelValues(typ, table).Observe(time.Since(startTime).Seconds())
 	}
+}
+
+func (c *Callbacks) registerAll(db *gorm.DB) {
+	// 监控查询的执行时间
+	err := db.Callback().Create().Before("*").Register("prometheus_create_before", c.before()) // 作用于Insert语句
+	if err != nil {
+		panic(err)
+	}
+	// 监控查询的执行时间
+	err = db.Callback().Create().After("*").Register("prometheus_create_after", c.after("create")) // 作用于Insert语句
+
+	// 监控查询的执行时间
+	err = db.Callback().Update().Before("*").Register("prometheus_update_before", c.before()) // 作用于Insert语句
+	if err != nil {
+		panic(err)
+	}
+	// 监控查询的执行时间
+	err = db.Callback().Update().After("*").Register("prometheus_update_after", c.after("update")) // 作用于Insert语句
+
+	// 监控查询的执行时间
+	err = db.Callback().Delete().Before("*").Register("prometheus_delete_before", c.before()) // 作用于Insert语句
+	if err != nil {
+		panic(err)
+	}
+	// 监控查询的执行时间
+	err = db.Callback().Delete().After("*").Register("prometheus_delete_after", c.after("delete")) // 作用于Insert语句
+
+	// 监控查询的执行时间
+	err = db.Callback().Query().Before("*").Register("prometheus_query_before", c.before()) // 作用于Insert语句
+	if err != nil {
+		panic(err)
+	}
+	// 监控查询的执行时间
+	err = db.Callback().Query().After("*").Register("prometheus_query_after", c.after("query")) // 作用于Insert语句
+
+	// 监控查询的执行时间
+	err = db.Callback().Row().Before("*").Register("prometheus_row_before", c.before()) // 作用于Insert语句
+	if err != nil {
+		panic(err)
+	}
+	// 监控查询的执行时间
+	err = db.Callback().Row().After("*").Register("prometheus_row_after", c.after("row")) // 作用于Insert语句
+
+	// 监控查询的执行时间
+	err = db.Callback().Raw().Before("*").Register("prometheus_raw_before", c.before()) // 作用于Insert语句
+	if err != nil {
+		panic(err)
+	}
+	// 监控查询的执行时间
+	err = db.Callback().Raw().After("*").Register("prometheus_raw_after", c.after("raw")) // 作用于Insert语句
 }
