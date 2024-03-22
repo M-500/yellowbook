@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
+	"gin-web/internal/ioc"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
+	"time"
 )
 
 // @Description
@@ -11,8 +14,13 @@ import (
 
 func main() {
 	server := InitWebServer()
+	closeFn := ioc.InitOTEL()
 	initPrometheus() // 启动Prometheus
 	server.Run(":8372")
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	closeFn(ctx)
 }
 
 func initPrometheus() {

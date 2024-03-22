@@ -6,6 +6,7 @@ import (
 	"gin-web/pkg/ginx/middleware/metric"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 // @Description
@@ -35,6 +36,7 @@ func InitMiddlewares(redisClient redis.Cmdable) []gin.HandlerFunc {
 			Help:       "统计gin_web的HTTP接口",
 			InstanceId: "my_instance_id",
 		}).Build(),
+		otelgin.Middleware("webook"),
 		//middleware.NewLoginMiddlewareBuilder().
 		//	IgnorePath("/user/login").
 		//	IgnorePath("/login-sms/code/send").
