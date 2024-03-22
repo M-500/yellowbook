@@ -52,7 +52,7 @@ func newResource(serviceName, serviceVersion string) (*resource.Resource, error)
 
 func newTraceProvider(res *resource.Resource) (*trace.TracerProvider, error) {
 	exporter, err := zipkin.New(
-		"http://localhost:9411/api/v2/spans")
+		"http://192.168.1.52:9411/api/v2/spans")
 	if err != nil {
 		return nil, err
 	}
